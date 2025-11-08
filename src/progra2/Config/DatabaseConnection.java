@@ -4,6 +4,9 @@
  */
 package progra2.Config;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 /**
  *
@@ -33,6 +36,10 @@ public final class DatabaseConnection {
     
     private DatabaseConnection() {
         throw new UnsupportedOperationException("Esta es una clase utilitaria y no debe ser instanciada");
+    }
+    
+    public static Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(URL, USER, PASSWORD);
     }
     
     
