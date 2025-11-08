@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/Users/martin/Documents/TUP/Programacion%20II/Progra2-TPI/src/progra2/Progra2TPI.java</file>
+            <file>file:/Users/martin/Documents/TUP/Programacion%20II/Progra2-TPI/src/progra2/Models/BaseModel.java</file>
+            <file>file:/Users/martin/Documents/TUP/Programacion%20II/Progra2-TPI/src/progra2/Models/Libro.java</file>
+            <file>file:/Users/martin/Documents/TUP/Programacion%20II/Progra2-TPI/src/progra2/Models/FichaBibliografica.java</file>
+            <file>file:/Users/martin/Documents/TUP/Programacion%20II/Progra2-TPI/src/progra2/Config/DatabaseConnection.java</file>
+            <file>file:/Users/martin/Documents/TUP/Programacion%20II/Progra2-TPI/src/progra2/Config/TransactionManager.java</file>
+            <file>file:/Users/martin/Documents/TUP/Programacion%20II/Progra2-TPI/src/progra2/DAO/GenericDAO.java</file>
+        </group>
+    </open-files>
+</project-private>
