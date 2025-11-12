@@ -1,6 +1,6 @@
-package progra2;
+package progra2.Main;
 
-public class Progra2TPI {
+public class Main {
     
     public static void main(String[] args) {
         
