@@ -2,6 +2,11 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/C:/Users/user/Desktop/TPI-Programacion2/TUPAD-P2-TPI/src/progra2/DAO/GenericDAO.java</file>
+            <file>file:/C:/Users/user/Desktop/TPI-Programacion2/TUPAD-P2-TPI/src/progra2/DAO/LibroDAO.java</file>
+            <file>file:/C:/Users/user/Desktop/TPI-Programacion2/TUPAD-P2-TPI/src/progra2/DAO/FichaBibliograficaDAO.java</file>
+            <file>file:/C:/Users/user/Desktop/TPI-Programacion2/TUPAD-P2-TPI/src/progra2/Config/DatabaseConnection.java</file>
+        </group>
     </open-files>
 </project-private>
