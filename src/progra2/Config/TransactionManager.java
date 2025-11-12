@@ -1,20 +1,16 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package progra2.Config;
 
-/**
- *
- * @author martin
- */
 import java.sql.Connection;
 import java.sql.SQLException;
 
+/** JAVADOC AQUÍ */
 public class TransactionManager implements AutoCloseable {
+    
+    // Atributos
     private Connection conn;
     private boolean transactionActive;
-
+    
+    // Constructor
     public TransactionManager(Connection conn) throws SQLException {
         if (conn == null) {
             throw new IllegalArgumentException("La conexión no puede ser null");
@@ -22,11 +18,13 @@ public class TransactionManager implements AutoCloseable {
         this.conn = conn;
         this.transactionActive = false;
     }
-
+    
+    /** JAVADOC AQUÍ */
     public Connection getConnection() {
         return conn;
     }
-
+    
+    /** JAVADOC AQUÍ */
     public void startTransaction() throws SQLException {
         if (conn == null) {
             throw new SQLException("No se puede iniciar la transacción: conexión no disponible");
@@ -37,7 +35,8 @@ public class TransactionManager implements AutoCloseable {
         conn.setAutoCommit(false);
         transactionActive = true;
     }
-
+    
+    /** JAVADOC AQUÍ */
     public void commit() throws SQLException {
         if (conn == null) {
             throw new SQLException("Error al hacer commit: no hay conexión establecida");
@@ -48,7 +47,8 @@ public class TransactionManager implements AutoCloseable {
         conn.commit();
         transactionActive = false;
     }
-
+    
+    /** JAVADOC AQUÍ */
     public void rollback() {
         if (conn != null && transactionActive) {
             try {
@@ -59,7 +59,8 @@ public class TransactionManager implements AutoCloseable {
             }
         }
     }
-
+    
+    /** JAVADOC AQUÍ */
     @Override
     public void close() {
         if (conn != null) {
@@ -74,9 +75,10 @@ public class TransactionManager implements AutoCloseable {
             }
         }
     }
-
+    
+    /** JAVADOC AQUÍ */
     public boolean isTransactionActive() {
         return transactionActive;
     }
+    
 }
-

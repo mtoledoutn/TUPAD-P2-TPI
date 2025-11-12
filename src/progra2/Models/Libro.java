@@ -1,17 +1,15 @@
-
 package progra2.Models;
 
-/**
- *
- * @author martin
- */
 public class Libro extends BaseModel {
+    
+    // Atributos
     private String titulo;
     private String autor;
     private String editorial;
-    private Integer anioEdicion; // Integer en lugar de int para permitir null.
+    private Integer anioEdicion;    // Integer en lugar de int para permitir null.
     private FichaBibliografica fichaBibliografica;
     
+    // Concstructor
     public Libro(int id, String titulo, String autor, String editorial, int anioEdicion, FichaBibliografica fichaBibliografica) {
         super(id, false);
         this.titulo = titulo;
@@ -28,43 +26,44 @@ public class Libro extends BaseModel {
     public String getTitulo() {
         return titulo;
     }
-
+    
     public String getAutor() {
         return autor;
     }
-
+    
     public String getEditorial() {
         return editorial;
     }
-
+    
     public Integer getAnioEdicion() {  //cambiado a Integer
         return anioEdicion;
     }
-
+    
     public FichaBibliografica getFichaBibliografica() {
         return fichaBibliografica;
     }
-
+    
     public void setTitulo(String titulo) {
         this.titulo = titulo;
     }
-
+    
     public void setAutor(String autor) {
         this.autor = autor;
     }
-
+    
     public void setEditorial(String editorial) {
         this.editorial = editorial;
     }
-
-    public void setAnioEdicion(Integer anioEdicion) {  //Cambiado a Integer
+    
+    public void setAnioEdicion(Integer anioEdicion) {    //Cambiado a Integer
         this.anioEdicion = anioEdicion;
     }
-
+    
     public void setFichaBibliografica(FichaBibliografica fichaBibliografica) {
         this.fichaBibliografica = fichaBibliografica;
     }
-
+    
+    /** JAVADOC AQUÍ */
     @Override
     public String toString() {
         return "Libro{" +
@@ -76,5 +75,6 @@ public class Libro extends BaseModel {
                 ", fichaBibliografica=" + fichaBibliografica +
                 ", eliminado=" + isEliminado() +
                 '}';
-    } 
+    }
+    
 }

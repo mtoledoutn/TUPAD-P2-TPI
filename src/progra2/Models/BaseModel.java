@@ -1,18 +1,12 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package progra2.Models;
 
-/**
- *
- * @author martin
- */
 public abstract class BaseModel {
     
+    // Atributos
     private int id;
     private boolean eliminado;
     
+    // Constructor
     protected BaseModel(int id, boolean eliminado) {
         this.id = id;
         this.eliminado = eliminado;
@@ -37,6 +31,5 @@ public abstract class BaseModel {
     public void setEliminado(boolean eliminado) {
         this.eliminado = eliminado;
     }
-    
     
 }
