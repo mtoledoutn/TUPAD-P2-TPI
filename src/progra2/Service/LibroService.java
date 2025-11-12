@@ -1,4 +1,4 @@
-package Service;
+package progra2.Service;
 
 /** JAVADOC AQUÍ */
 public class LibroService {
