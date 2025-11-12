@@ -1,18 +1,11 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package progra2.Config;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-/**
- *
- * @author martin
- */
 public final class DatabaseConnection {
+    
     /** URL de conexión JDBC. Configurable via -Ddb.url */
     private static final String URL = System.getProperty("db.url", "jdbc:mysql://localhost:3306/dbtpi3");
 
@@ -21,8 +14,8 @@ public final class DatabaseConnection {
 
     /** Contraseña del usuario. Configurable via -Ddb.password */
     private static final String PASSWORD = System.getProperty("db.password", "");
-
     
+    /** JAVADOC AQUÍ */
     static {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -34,15 +27,17 @@ public final class DatabaseConnection {
         }
     }
     
+    /** JAVADOC AQUÍ */
     private DatabaseConnection() {
         throw new UnsupportedOperationException("Esta es una clase utilitaria y no debe ser instanciada");
     }
     
+    /** JAVADOC AQUÍ */
     public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }
     
-    
+    /** JAVADOC AQUÍ */
     private static void validateConfiguration() {
         if (URL == null || URL.trim().isEmpty()) {
             throw new IllegalStateException("La URL de la base de datos no está configurada");
@@ -56,4 +51,5 @@ public final class DatabaseConnection {
             throw new IllegalStateException("La contraseña de la base de datos no está configurada");
         }
     }
+    
 }
