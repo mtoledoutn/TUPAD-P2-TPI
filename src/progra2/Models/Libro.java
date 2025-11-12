@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package progra2.Models;
 
 /**
@@ -12,7 +9,7 @@ public class Libro extends BaseModel {
     private String titulo;
     private String autor;
     private String editorial;
-    private int anioEdicion;
+    private Integer anioEdicion; // Integer en lugar de int para permitir null.
     private FichaBibliografica fichaBibliografica;
     
     public Libro(int id, String titulo, String autor, String editorial, int anioEdicion, FichaBibliografica fichaBibliografica) {
@@ -40,7 +37,7 @@ public class Libro extends BaseModel {
         return editorial;
     }
 
-    public int getAnioEdicion() {
+    public Integer getAnioEdicion() {  //cambiado a Integer
         return anioEdicion;
     }
 
@@ -60,7 +57,7 @@ public class Libro extends BaseModel {
         this.editorial = editorial;
     }
 
-    public void setAnioEdicion(int anioEdicion) {
+    public void setAnioEdicion(Integer anioEdicion) {  //Cambiado a Integer
         this.anioEdicion = anioEdicion;
     }
 

@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package progra2.Models;
 
 /**
@@ -15,7 +12,7 @@ public class FichaBibliografica extends BaseModel {
     private String idioma;
 
     public FichaBibliografica(String isbn, String clasificacionDewey, String estanteria, String idioma, int id, boolean eliminado) {
-        super(id, eliminado);
+        super(id, false);
         this.isbn = isbn;
         this.clasificacionDewey = clasificacionDewey;
         this.estanteria = estanteria;

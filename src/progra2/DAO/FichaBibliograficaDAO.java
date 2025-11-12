@@ -55,6 +55,7 @@ public class FichaBibliograficaDAO implements GenericDAO<FichaBibliografica> {
             stmt.setString(2, fichaBibliografica.getClasificacionDewey());
             stmt.setString(3, fichaBibliografica.getEstanteria());
             stmt.setString(4, fichaBibliografica.getIdioma());
+            stmt.setInt(5, fichaBibliografica.getId());
 
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected == 0) {
