@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+/** JAVADOC AQUÍ */
 public final class DatabaseConnection {
     
     /** URL de conexión JDBC. Configurable via -Ddb.url */
