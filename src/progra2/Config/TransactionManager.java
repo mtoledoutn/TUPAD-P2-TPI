@@ -6,11 +6,12 @@ import java.sql.SQLException;
 /** JAVADOC AQUÍ */
 public class TransactionManager implements AutoCloseable {
     
-    // Atributos
+    /** JAVADOC AQUÍ */
     private Connection conn;
+    /** JAVADOC AQUÍ */
     private boolean transactionActive;
     
-    // Constructor
+    /** JAVADOC AQUÍ */
     public TransactionManager(Connection conn) throws SQLException {
         if (conn == null) {
             throw new IllegalArgumentException("La conexión no puede ser null");

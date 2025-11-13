@@ -11,33 +11,65 @@ import progra2.Models.FichaBibliografica;
 public class LibroDAO implements GenericDAO<Libro> {
     
     /** JAVADOC AQUÍ */
-    private static final String INSERT_SQL = "INSERT INTO libros (titulo, autor, editorial, anioEdicion, fichaBibliograficaId) VALUES (?, ?, ?, ?, ?)";
-    
+    private static final String INSERT_SQL = "INSERT INTO libro (titulo, autor, editorial, anio_edicion, ficha_bibliografica_id) VALUES (?, ?, ?, ?, ?)";
     /** JAVADOC AQUÍ */
-    private static final String UPDATE_SQL = "UPDATE libros SET titulo = ?, autor = ?, editorial = ?, anioEdicion = ?, fichaBibliograficaId = ? WHERE id = ?";
-    
+    private static final String UPDATE_SQL = "UPDATE libro SET titulo = ?, autor = ?, editorial = ?, anio_edicion = ?, ficha_bibliografica_id = ? WHERE id = ?";
     /** JAVADOC AQUÍ */
-    private static final String DELETE_SQL = "UPDATE libros SET eliminado = TRUE WHERE id = ?";
-    
+    private static final String DELETE_SQL = "UPDATE libro SET eliminado = TRUE WHERE id = ?";
     /** JAVADOC AQUÍ */
     private static final String SELECT_BY_ID_SQL =
-            "SELECT l.id, l.titulo, l.autor, l.editorial, l.anioEdicion, " +
-            "f.id AS ficha_id, f.clasificacion_dewey, f.estanteria, f.idioma " +
-            "FROM libros l LEFT JOIN ficha_bibliografica f ON l.fichaBibliograficaId = f.id " +
+            "SELECT l.id, l.eliminado, l.titulo, l.autor, l.editorial, l.anio_edicion, " +
+            "f.id AS ficha_id, f.eliminado AS ficha_eliminado, f.isbn, f.clasificacion_dewey, f.estanteria, f.idioma " +
+            "FROM libro l " +
+            "LEFT JOIN ficha_bibliografica f ON l.ficha_bibliografica_id = f.id " +
             "WHERE l.id = ? AND l.eliminado = FALSE";
-    
+    /** JAVADOC AQUÍ */
+    private static final String SELECT_BY_TITULO_SQL =
+            "SELECT l.id, l.eliminado, l.titulo, l.autor, l.editorial, l.anio_edicion, " +
+            "f.id AS ficha_id, f.eliminado AS ficha_eliminado, f.isbn, f.clasificacion_dewey, f.estanteria, f.idioma " +
+            "FROM libro l " +
+            "LEFT JOIN ficha_bibliografica f ON l.ficha_bibliografica_id = f.id " +
+            "WHERE UPPER(l.titulo) LIKE UPPER(?) AND l.eliminado = FALSE";
+    /** JAVADOC AQUÍ */
+    private static final String SELECT_BY_AUTOR_SQL =
+            "SELECT l.id, l.eliminado, l.titulo, l.autor, l.editorial, l.anio_edicion, " +
+            "f.id AS ficha_id, f.eliminado AS ficha_eliminado, f.isbn, f.clasificacion_dewey, f.estanteria, f.idioma " +
+            "FROM libro l " +
+            "LEFT JOIN ficha_bibliografica f ON l.ficha_bibliografica_id = f.id " +
+            "WHERE UPPER(l.autor) LIKE UPPER(?) AND l.eliminado = FALSE";
+    /** JAVADOC AQUÍ */
+    private static final String SELECT_BY_EDITORIAL_SQL =
+            "SELECT l.id, l.eliminado, l.titulo, l.autor, l.editorial, l.anio_edicion, " +
+            "f.id AS ficha_id, f.eliminado AS ficha_eliminado, f.isbn, f.clasificacion_dewey, f.estanteria, f.idioma " +
+            "FROM libro l " +
+            "LEFT JOIN ficha_bibliografica f ON l.ficha_bibliografica_id = f.id " +
+            "WHERE UPPER(l.editorial) = UPPER(?) AND l.eliminado = FALSE";
+    /** JAVADOC AQUÍ */
+    private static final String SELECT_BY_ANIO_SQL =
+            "SELECT l.id, l.eliminado, l.titulo, l.autor, l.editorial, l.anio_edicion, " +
+            "f.id AS ficha_id, f.eliminado AS ficha_eliminado, f.isbn, f.clasificacion_dewey, f.estanteria, f.idioma " +
+            "FROM libro l " +
+            "LEFT JOIN ficha_bibliografica f ON l.ficha_bibliografica_id = f.id " +
+            "WHERE l.anio_edicion = ? AND l.eliminado = FALSE";
+    /** JAVADOC AQUÍ */
+    private static final String SELECT_BY_IDIOMA_SQL =
+            "SELECT l.id, l.eliminado, l.titulo, l.autor, l.editorial, l.anio_edicion, " +
+            "f.id AS ficha_id, f.eliminado AS ficha_eliminado, f.isbn, f.clasificacion_dewey, f.estanteria, f.idioma " +
+            "FROM libro l " +
+            "LEFT JOIN ficha_bibliografica f ON l.ficha_bibliografica_id = f.id " +
+            "WHERE UPPER(f.idioma) = UPPER(?) AND l.eliminado = FALSE";
     /** JAVADOC AQUÍ */
     private static final String SELECT_ALL_SQL =
-            "SELECT l.id, l.titulo, l.autor, l.editorial, l.anioEdicion, " +
-            "f.id AS ficha_id, f.clasificacion_dewey, f.estanteria, f.idioma " +
-            "FROM libros l LEFT JOIN ficha_bibliografica f ON l.fichaBibliograficaId = f.id " +
+            "SELECT l.id, l.eliminado, l.titulo, l.autor, l.editorial, l.anio_edicion, " +
+            "f.id AS ficha_id, f.eliminado AS ficha_eliminado, f.isbn, f.clasificacion_dewey, f.estanteria, f.idioma " +
+            "FROM libro l " +
+            "LEFT JOIN ficha_bibliografica f ON l.ficha_bibliografica_id = f.id " +
             "WHERE l.eliminado = FALSE";
     
-    // IMPLEMENTAR SEARCH BY DISTINTAS COLUMNAS
     
     /** JAVADOC AQUÍ */
     @Override
-    public void insertar(Libro libro) throws Exception {
+    public void insertar(Libro libro) throws SQLException {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
             
@@ -49,23 +81,23 @@ public class LibroDAO implements GenericDAO<Libro> {
     
     /** JAVADOC AQUÍ */
     @Override
-    public void insertTx(Libro libro, Connection conn) throws Exception {
+    public void insertTx(Libro libro, Connection conn) throws SQLException {
         try (PreparedStatement stmt = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
             
-            setLibrosParameters(stmt,libro);
+            setLibrosParameters(stmt, libro);
             stmt.executeUpdate();
-            setGeneratedId(stmt,libro);
+            setGeneratedId(stmt, libro);
         }
     }
     
     /** JAVADOC AQUÍ */
     @Override
-    public void actualizar(Libro libro) throws Exception {
+    public void actualizar(Libro libro) throws SQLException {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(UPDATE_SQL)) {
             
-            setLibrosParameters(stmt,libro);
-            stmt.setInt(6,libro.getId());
+            setLibrosParameters(stmt, libro);
+            stmt.setInt(6, libro.getId());
             
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected == 0) {
@@ -76,11 +108,11 @@ public class LibroDAO implements GenericDAO<Libro> {
     
     /** JAVADOC AQUÍ */
     @Override
-    public void eliminar(int id) throws Exception {
+    public void eliminar(int id) throws SQLException {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(DELETE_SQL)) {
             
-            stmt.setInt(1,id);
+            stmt.setInt(1, id);
             
             int rows = stmt.executeUpdate();
             if (rows == 0) {
@@ -91,15 +123,15 @@ public class LibroDAO implements GenericDAO<Libro> {
     
     /** JAVADOC AQUÍ */
     @Override
-    public Libro getById(int id) throws Exception {
+    public Libro getById(int id) throws SQLException {
         try(Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(SELECT_BY_ID_SQL)) {
             
-            stmt.setInt(1,id);
+            stmt.setInt(1, id);
             
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return mapResulSetToLibro(rs);
+                    return mapResultSetToLibro(rs);
                 }
             }
         }
@@ -107,69 +139,113 @@ public class LibroDAO implements GenericDAO<Libro> {
     }
     
     /** JAVADOC AQUÍ */
+    public List<Libro> getByTitulo(String titulo) throws SQLException {
+        List<Libro> libros = new ArrayList<>();
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(SELECT_BY_TITULO_SQL)) {
+            
+            stmt.setString(1, "%" + titulo + "%");
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    libros.add(mapResultSetToLibro(rs));
+                }
+            }
+        }
+        return libros;
+    }
+    
+    /** JAVADOC AQUÍ */
+    public List<Libro> getByAutor(String autor) throws SQLException {
+        List<Libro> libros = new ArrayList<>();
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(SELECT_BY_AUTOR_SQL)) {
+            
+            stmt.setString(1, "%" + autor + "%");
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    libros.add(mapResultSetToLibro(rs));
+                }
+            }
+        }
+        return libros;
+    }
+    
+    /** JAVADOC AQUÍ */
+    public List<Libro> getByEditorial(String editorial) throws SQLException {
+        List<Libro> libros = new ArrayList<>();
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(SELECT_BY_EDITORIAL_SQL)) {
+            
+            stmt.setString(1, editorial);
+            
+            try (ResultSet rs = stmt.executeQuery()){
+                while (rs.next()) {
+                    libros.add(mapResultSetToLibro(rs));
+                }
+            }
+        }
+        return libros;
+    }
+    
+    /** JAVADOC AQUÍ */
+    public List<Libro> getByAnioEdicion(int anio) throws SQLException {
+    List<Libro> libros = new ArrayList<>();
+    
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(SELECT_BY_ANIO_SQL)) {
+            
+            stmt.setInt(1, anio);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    libros.add(mapResultSetToLibro(rs));
+                }
+            }
+        }
+        return libros;
+    }
+    
+    /** JAVADOC AQUÍ */
+    public List<Libro> getByIdioma(String idioma) throws SQLException {
+        List<Libro> libros = new ArrayList<>();
+        
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(SELECT_BY_IDIOMA_SQL)) {
+            
+            stmt.setString(1,idioma);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    libros.add(mapResultSetToLibro(rs));
+                }
+            }
+        }
+        return libros;
+    }
+    
+    /** JAVADOC AQUÍ */
     @Override
-    public List<Libro> getAll() throws Exception {
-        List<Libro> libros = new ArrayList();
+    public List<Libro> getAll() throws SQLException {
+        List<Libro> libros = new ArrayList<>();
           
         try (Connection conn = DatabaseConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(SELECT_ALL_SQL)) {
             
             while (rs.next()) {
-                libros.add(mapResulSetToLibro(rs));
-            }
-        }
-        return libros;
-    }
-    
-    /** JAVADOC AQUÍ */
-    public List<Libro> getByEditorial(String editorial) throws Exception {
-        List<Libro> libros = new ArrayList();
-        
-        String sql = "SELECT l.id, l.titulo, l.autor, l.editorial, l.anioEdicion, " + 
-                "f.id AS ficha_id, f.clasificacion_dewey, f.estanteria, f.idioma" +
-                "FROM libros l LEFT JOIN ficha_bibliografica f ON l.fichaBibliograficaId = f.id " +
-                "WHERE l.editorial = ? AND l.eliminado = FALSE";
-        
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            stmt.setString(1,editorial);
-            
-            try (ResultSet rs = stmt.executeQuery()){
-                while (rs.next()) {
-                    libros.add(mapResulSetToLibro(rs));
-                }
-            }
-        }
-        return libros;
-    }
-    
-    /** JAVADOC AQUÍ */
-    public List<Libro> getByIdioma(String idioma) throws Exception {
-        List<Libro> libros = new ArrayList();
-        
-        String sql = "SELECT l.id, l.titulo, l.autor, l.editorial, l.anioEdicion, " +
-                "f.id AS ficha_id, f.clasificacion_dewey, f.estanteria, f.idioma " +
-                "FROM libros l LEFT JOIN ficha_bibliografica f ON l.fichaBibliograficaId = f.id " +
-                "WHERE f.idioma = ? AND l.eliminado = FALSE";
-        
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            stmt.setString(1,idioma);
-            
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    libros.add(mapResulSetToLibro(rs));
-                }
+                libros.add(mapResultSetToLibro(rs));
             }
         }
         return libros;
     }
     
     
-    // ==================== Métodos Auxiliares ====================
+    // ========================== Métodos Auxiliares ==========================
     
     /** JAVADOC AQUÍ */
     private void setLibrosParameters(PreparedStatement stmt, Libro libro) throws SQLException {
@@ -192,7 +268,7 @@ public class LibroDAO implements GenericDAO<Libro> {
     }
     
     /** JAVADOC AQUÍ */
-    private Libro mapResulSetToLibro(ResultSet rs) throws SQLException {
+    private Libro mapResultSetToLibro(ResultSet rs) throws SQLException {
         // Construir la ficha bibliográfica asociada
         FichaBibliografica ficha = new FichaBibliografica(
                 null,
@@ -209,7 +285,7 @@ public class LibroDAO implements GenericDAO<Libro> {
                 rs.getString("titulo"),
                 rs.getString("autor"),
                 rs.getString("editorial"),
-                rs.getInt("anioEdicion"),
+                rs.getInt("anio_edicion"),
                 ficha
         );
     }

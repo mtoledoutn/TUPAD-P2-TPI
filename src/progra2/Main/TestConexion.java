@@ -10,18 +10,16 @@ public class TestConexion {
     public static void main(String[] args){
         System.out.println("Probando conexion a la base de datos...");
         
-        try(Connection conn = DatabaseConnection.getConnection()){
-            
+        try (Connection conn = DatabaseConnection.getConnection()) {
             if (conn != null && !conn.isClosed()) {
                 System.out.println("Conexion exitosa!");
                 System.out.println("Base de datos: " + conn.getCatalog());
                 System.out.println("URL: " + conn.getMetaData().getURL());
                 conn.close();
-                System.out.println("Conexion cerra correctamente.");
-                
+                System.out.println("Conexion cerrada correctamente.");
             }
-        }catch(SQLException e){
-            System.out.println("Erros de conexion!");
+        } catch (SQLException e) {
+            System.out.println("Error de conexion!");
             System.out.println("Mensaje: " + e.getMessage());
             e.printStackTrace();
         }

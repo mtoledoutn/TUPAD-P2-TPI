@@ -11,16 +11,12 @@ public class FichaBibliograficaDAO implements GenericDAO<FichaBibliografica> {
     
     /** JAVADOC AQUÍ */
     private static final String INSERT_SQL = "INSERT INTO ficha_bibliografica (isbn, clasificacion_dewey, estanteria, idioma) VALUES (?, ?, ?, ?)";
-    
     /** JAVADOC AQUÍ */
     private static final String UPDATE_SQL = "UPDATE ficha_bibliografica SET isbn = ?, clasificacion_dewey = ?, estanteria = ?, idioma = ? WHERE id = ?";
-    
     /** JAVADOC AQUÍ */
     private static final String DELETE_SQL = "UPDATE ficha_bibliografica SET eliminado = TRUE WHERE id = ?";
-    
     /** JAVADOC AQUÍ */
     private static final String SELECT_BY_ID_SQL = "SELECT * FROM ficha_bibliografica WHERE id = ? AND eliminado = FALSE";
-    
     /** JAVADOC AQUÍ */
     private static final String SELECT_ALL_SQL = "SELECT * FROM ficha_bibliografica WHERE eliminado = FALSE";
     
@@ -38,7 +34,7 @@ public class FichaBibliograficaDAO implements GenericDAO<FichaBibliografica> {
     
     /** JAVADOC AQUÍ */
     @Override
-    public void insertTx(FichaBibliografica fichaBibliografica, Connection conn) throws Exception {
+    public void insertTx(FichaBibliografica fichaBibliografica, Connection conn) throws SQLException {
         try (PreparedStatement stmt = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
             
             setFichaParameters(stmt, fichaBibliografica);
