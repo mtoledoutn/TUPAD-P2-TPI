@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Scanner;
 import progra2.Models.FichaBibliografica;
 import progra2.Models.Libro;
+import progra2.Service.FichaBibliograficaService;
 import progra2.Service.LibroService;
 
 /**
@@ -19,16 +20,22 @@ public class MenuHandler {
 
 
     private final LibroService libroService;
+    
+    private final FichaBibliograficaService fichaService;
 
-    public MenuHandler(Scanner scanner, LibroService libroService) {
+    public MenuHandler(Scanner scanner, LibroService libroService, FichaBibliograficaService fichaService) {
         if (scanner == null) {
             throw new IllegalArgumentException("Scanner no puede ser null");
         }
         if (libroService == null) {
             throw new IllegalArgumentException("LibroService no puede ser null");
         }
+        if (fichaService == null) {
+            throw new IllegalArgumentException("FichaService no puede ser null");
+        }
         this.scanner = scanner;
         this.libroService = libroService;
+        this.fichaService = fichaService;
     }
 
 
@@ -41,14 +48,26 @@ public class MenuHandler {
             System.out.print("Editorial: ");
             String editorial = scanner.nextLine().trim();
             System.out.print("Año de edicion: ");
-            int anio_edicion = scanner.nextInt();
+            int anio_edicion = Integer.parseInt(scanner.nextLine().trim());
+            
+            //opcion: crear libro con o sin ficha
+            
+            System.out.println("Desea crear una ficha bibliografica para el libro? (S/N): ");
+            String respuesta = scanner.nextLine().trim().toUpperCase();
 
-            FichaBibliografica fichaBibliografica;
-            System.out.print("Ahora crearemos la ficha bibliográfica del libro: ");
-            fichaBibliografica = crearFicha();
+            FichaBibliografica fichaBibliografica = null;
+            
+            if (respuesta.equals("S")) {
+                System.out.println("Ahora crearemos la ficha bibliografica del libro....");
+                fichaBibliografica = crearFicha();
+                
+                //insertamos ficha en la bd
+                fichaService.insertar(fichaBibliografica);
+                System.out.println("Ficha creada con ID: " + fichaBibliografica.getId());
+            }
+           
             
             Libro libro = new Libro(0, titulo, autor, editorial, anio_edicion, fichaBibliografica);
-            libro.setFichaBibliografica(fichaBibliografica);
             libroService.insertar(libro);
             System.out.println("Libro creado exitosamente con ID: " + libro.getId());
         } catch (Exception e) {
@@ -61,9 +80,9 @@ public class MenuHandler {
         String isbn = scanner.nextLine().trim();
         System.out.print("Clasificacion Dewey: ");
         String clasificacionDewey = scanner.nextLine().trim();
-        System.out.print("Estanteria");
+        System.out.print("Estanteria: ");
         String estanteria = scanner.nextLine().trim();
-        System.out.print("idioma");
+        System.out.print("idioma: ");
         String idioma = scanner.nextLine().trim();
         return new FichaBibliografica(isbn, clasificacionDewey, estanteria, idioma, 0, false);
     }

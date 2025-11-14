@@ -17,8 +17,10 @@ public class AppMenu {
     
     public AppMenu() {
         this.scanner = new Scanner(System.in);
-        LibroService libroService = createLibroService();
-        this.menuHandler = new MenuHandler(scanner, libroService);
+        FichaBibliograficaService fichaService = createFichaService();
+        LibroService libroService = createLibroService(fichaService);
+        
+        this.menuHandler = new MenuHandler(scanner, libroService, fichaService);
         this.running = true;
     }
     
@@ -54,11 +56,17 @@ public class AppMenu {
         }
     }
     
-    private LibroService createLibroService() {
-        FichaBibliograficaDAO fichaBibliograficaDAO = new FichaBibliograficaDAO();
+    
+    private FichaBibliograficaService createFichaService(){
+        FichaBibliograficaDAO fichaDAO =  new FichaBibliograficaDAO();
+        return new FichaBibliograficaService(fichaDAO);
+        
+    }
+    
+    
+    private LibroService createLibroService(FichaBibliograficaService fichaService) {
         LibroDAO libroDAO = new LibroDAO();
-        FichaBibliograficaService fichaBibliograficaService = new FichaBibliograficaService(fichaBibliograficaDAO);
-        return new LibroService(libroDAO, fichaBibliograficaService);
+        return new LibroService(libroDAO, fichaService);
     }
     
 }
