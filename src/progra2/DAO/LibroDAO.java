@@ -254,18 +254,18 @@ public class LibroDAO implements GenericDAO<Libro> {
         stmt.setString(3, libro.getEditorial());
         
         
-        //Manejar anio_edicion nulleable
-        if(libro.getAnioEdicion() != null){
-            stmt.setInt(4, libro.getAnioEdicion());
-        }else{
-            stmt.setInt(4, java.sql.Types.INTEGER);
+        // Manejar anio_edicion nulleable
+        if (libro.getAnioEdicion() != null) {
+            stmt.setNull(4, libro.getAnioEdicion());
+        } else {
+            stmt.setNull(4, java.sql.Types.INTEGER);
         }
         
-        //Manejar fichaBibliografica_id nulleable
+        // Manejar fichaBibliografica_id nulleable
         if (libro.getFichaBibliografica() != null && libro.getFichaBibliografica().getId() > 0) {
-            stmt.setInt(5, libro.getFichaBibliografica().getId());
-        }else{
-            stmt.setInt(5, java.sql.Types.INTEGER);
+            stmt.setNull(5, libro.getFichaBibliografica().getId());
+        } else {
+            stmt.setNull(5, java.sql.Types.INTEGER);
         }
     }
     

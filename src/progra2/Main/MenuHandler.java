@@ -9,18 +9,26 @@ import progra2.Service.LibroService;
 
 /**
  * Controlador de operaciones del menú que procesa las interacciones del usuario.
- * Coordina la lógica de negocio entre la capa de presentación y la capa de servicio.
+ * Funciona como puente entre la capa de presentación (menu) y la capa de negocio (services).
  */
 public class MenuHandler {
     
-    /** Scanner para capturar entrada del usuario */
+    /** Scanner para capturar entrada del usuario. */
     private final Scanner scanner;
     
-    /** Servicio de libros que encapsula la lógica de negocio */
+    /** Servicio de libros que encapsula la lógica de negocio. */
     private final LibroService libroService;
     
+    /** Servicio para operaciones relacionadas con fichas bibliográficas. */
     private final FichaBibliograficaService fichaService;
-
+    
+    /**
+     * Constructor que recibe los servicios necesarios.
+     *
+     * @param scanner scanner compartido para entrada de datos
+     * @param libroService servicio de libros
+     * @param fichaService servicio de fichas bibliográficas
+     */
     public MenuHandler(Scanner scanner, LibroService libroService, FichaBibliograficaService fichaService) {
         if (scanner == null) {
             throw new IllegalArgumentException("Scanner no puede ser null");
@@ -36,6 +44,7 @@ public class MenuHandler {
         this.fichaService = fichaService;
     }
     
+    /** Método que verifica la conexión a la base de datos. */
     public void verificarConexion() {
         TestConexion.main(null);
     }
@@ -58,7 +67,7 @@ public class MenuHandler {
 
             int anio_edicion = Integer.parseInt(scanner.nextLine().trim());
             
-            //opcion: crear libro con o sin ficha
+            // Opcion: crear libro con o sin ficha
             
             System.out.println("Desea crear una ficha bibliografica para el libro? (S/N): ");
             String respuesta = scanner.nextLine().trim().toUpperCase();
