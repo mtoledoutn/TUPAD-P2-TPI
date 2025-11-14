@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package progra2.Main;
 
 import java.util.List;
@@ -11,15 +7,25 @@ import progra2.Models.Libro;
 import progra2.Service.LibroService;
 
 /**
- *
- * @author met
+ * Controlador de operaciones del menú que procesa las interacciones del usuario.
+ * Coordina la lógica de negocio entre la capa de presentación y la capa de servicio.
  */
 public class MenuHandler {
+    
+    /** Scanner para capturar entrada del usuario */
     private final Scanner scanner;
-
-
+    
+    /** Servicio de libros que encapsula la lógica de negocio */
     private final LibroService libroService;
-
+    
+    /**
+     * Constructor que inicializa el handler con sus dependencias.
+     * Valida que ninguna dependencia sea nula para evitar NullPointerException.
+     * 
+     * @param scanner instancia de Scanner para entrada de usuario
+     * @param libroService servicio para operaciones de libros
+     * @throws IllegalArgumentException si algún parámetro es null
+     */
     public MenuHandler(Scanner scanner, LibroService libroService) {
         if (scanner == null) {
             throw new IllegalArgumentException("Scanner no puede ser null");
@@ -30,10 +36,15 @@ public class MenuHandler {
         this.scanner = scanner;
         this.libroService = libroService;
     }
-
-
+    
+    /**
+     * Flujo interactivo para crear un nuevo libro con su ficha bibliográfica.
+     * Captura todos los datos necesarios y persiste el libro en la base de datos.
+     * La operación es atómica: si falla, no se guarda nada.
+     */
     public void crearLibro() {
         try {
+            // Captura de datos del libro
             System.out.print("Titulo: ");
             String titulo = scanner.nextLine().trim();
             System.out.print("Autor: ");
@@ -42,11 +53,13 @@ public class MenuHandler {
             String editorial = scanner.nextLine().trim();
             System.out.print("Año de edicion: ");
             int anio_edicion = scanner.nextInt();
-
+            
+            // Creación de ficha bibliográfica asociada
             FichaBibliografica fichaBibliografica;
             System.out.print("Ahora crearemos la ficha bibliográfica del libro: ");
             fichaBibliografica = crearFicha();
             
+            // Construcción e inserción del libro
             Libro libro = new Libro(0, titulo, autor, editorial, anio_edicion, fichaBibliografica);
             libro.setFichaBibliografica(fichaBibliografica);
             libroService.insertar(libro);
@@ -56,6 +69,11 @@ public class MenuHandler {
         }
     }
     
+    /**
+     * Captura los datos necesarios para crear una ficha bibliográfica.
+     * 
+     * @return instancia de FichaBibliografica con los datos capturados
+     */
     private FichaBibliografica crearFicha() {
         System.out.print("ISBN: ");
         String isbn = scanner.nextLine().trim();
@@ -67,13 +85,20 @@ public class MenuHandler {
         String idioma = scanner.nextLine().trim();
         return new FichaBibliografica(isbn, clasificacionDewey, estanteria, idioma, 0, false);
     }
-
+    
+    /**
+     * Flujo interactivo para actualizar campos individuales de una ficha bibliográfica.
+     * Permite modificar múltiples campos en una sola sesión.
+     * 
+     * @param f ficha bibliográfica a actualizar
+     */
     private void updateFichaById(FichaBibliografica f) {
         if (f == null) {
             System.out.println("La ficha bibliográfica no existe.");
             return;
         }
-
+        
+        // Bucle de actualización hasta que el usuario decida volver
         while (true) {
             System.out.println("\nFicha actual: ISBN='" + f.getIsbn() + "', Dewey='" + f.getClasificacionDewey() + "', Estanteria='" + f.getEstanteria() + "', Idioma='" + f.getIdioma() + "'");
             System.out.println("Seleccione atributo a actualizar:");
@@ -94,7 +119,8 @@ public class MenuHandler {
             }
 
             if (foInt == 5) break;
-
+            
+            // Actualización selectiva de campos
             switch (foInt) {
                 case 1 -> {
                     System.out.print("Nuevo ISBN (actual: " + f.getIsbn() + ", Enter para mantener): ");
@@ -120,7 +146,11 @@ public class MenuHandler {
             }
         }
     }
-
+    
+    /**
+     * Lista libros según diferentes criterios de búsqueda.
+     * Permite listar todos los libros o filtrar por autor, título, año o idioma.
+     */
     public void listarLibros() {
         try {
             System.out.print("¿Desea (1) listar todos o (2) buscar por autor (3) titulo (4) año de publicacion (5) idioma? Ingrese opcion: ");
@@ -128,6 +158,8 @@ public class MenuHandler {
 
             List<Libro> libros;
             String filtro;
+            
+            // Selección de estrategia de búsqueda
             switch (subopcion) {
                 case 1 -> libros = libroService.getAll();
                 case 2 -> {
@@ -155,19 +187,20 @@ public class MenuHandler {
                     return;
                 }
             }
-
+            
             if (libros.isEmpty()) {
                 System.out.println("No se encontraron libros.");
                 return;
             }
-
+            
+            // Impresión de resultados con datos de ficha bibliográfica
             for (Libro l : libros) {
                 System.out.println("ID: " + l.getId()
                         + ", Titulo: " + l.getTitulo()
                         + ", Autor: " + l.getAutor()
                         + ", Editorial: " + l.getEditorial()
                         + ", Año: " + l.getAnioEdicion());
-
+                
                 FichaBibliografica f = l.getFichaBibliografica();
                 if (f != null) {
                     System.out.println("   ISBN: " + f.getIsbn()
@@ -180,7 +213,12 @@ public class MenuHandler {
             System.err.println("Error al listar personas: " + e.getMessage());
         }
     }
-
+    
+    /**
+     * Flujo interactivo para actualizar un libro existente.
+     * Permite modificar campos del libro y su ficha bibliográfica asociada.
+     * Los cambios no se persisten hasta confirmar explícitamente.
+     */
     public void actualizarLibro() {
         try {
             System.out.print("ID del libro a a actualizar: ");
@@ -192,6 +230,7 @@ public class MenuHandler {
                 return;
             }
             
+            // Bucle de actualización con menú de campos modificables
             while (true) {
                 System.out.println("\nLibro encontrado: ID=" + l.getId() + ", Titulo='" + l.getTitulo() + "', Autor='" + l.getAutor() + "', Editorial='" + l.getEditorial() + "', Año='" + l.getAnioEdicion() + "'");
                 System.out.println("Seleccione campo a actualizar:");
@@ -212,7 +251,8 @@ public class MenuHandler {
                     System.out.println("Opcion invalida.");
                     continue;
                 }
-
+                
+                // Procesamiento de la opción seleccionada
                 switch (opt) {
                     case 1 -> {
                         System.out.print("Nuevo titulo (actual: " + l.getTitulo() + ", Enter para mantener): ");
@@ -271,5 +311,5 @@ public class MenuHandler {
             System.err.println("Error al actualizar persona: " + e.getMessage());
         }
     }
-
+    
 }

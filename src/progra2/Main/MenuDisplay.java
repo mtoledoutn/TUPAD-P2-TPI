@@ -1,14 +1,15 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package progra2.Main;
 
 /**
- *
- * @author met
+ * Clase utilitaria responsable de mostrar la interfaz de menú en consola.
+ * Centraliza la presentación visual del menú principal de la aplicación.
  */
 public class MenuDisplay {
+    
+    /**
+     * Muestra el menú principal con todas las opciones disponibles.
+     * Incluye operaciones CRUD básicas para libros y opción de salida.
+     */
     public static void mostrarMenuPrincipal() {
         System.out.println("\n========= MENU - Libros =========");
         System.out.println("1. Crear libro");
@@ -17,4 +18,5 @@ public class MenuDisplay {
         System.out.println("0. Salir");
         System.out.print("Ingrese una opcion: ");
     }
+    
 }
