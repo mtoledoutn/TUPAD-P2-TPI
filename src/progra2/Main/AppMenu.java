@@ -27,8 +27,10 @@ public class AppMenu {
      */
     public AppMenu() {
         this.scanner = new Scanner(System.in);
-        LibroService libroService = createLibroService();
-        this.menuHandler = new MenuHandler(scanner, libroService);
+        FichaBibliograficaService fichaService = createFichaService();
+        LibroService libroService = createLibroService(fichaService);
+        
+        this.menuHandler = new MenuHandler(scanner, libroService, fichaService);
         this.running = true;
     }
     
@@ -78,17 +80,15 @@ public class AppMenu {
             default -> System.out.println("Opcion no valida.");
         }
     }
+ 
+    private FichaBibliograficaService createFichaService(){
+        FichaBibliograficaDAO fichaDAO =  new FichaBibliograficaDAO();
+        return new FichaBibliograficaService(fichaDAO);
+    }
     
-    /**
-     * Factory method que crea e inyecta las dependencias necesarias para LibroService.
-     * 
-     * @return instancia configurada de LibroService con sus dependencias
-     */
-    private LibroService createLibroService() {
-        FichaBibliograficaDAO fichaBibliograficaDAO = new FichaBibliograficaDAO();
+    private LibroService createLibroService(FichaBibliograficaService fichaService) {
         LibroDAO libroDAO = new LibroDAO();
-        FichaBibliograficaService fichaBibliograficaService = new FichaBibliograficaService(fichaBibliograficaDAO);
-        return new LibroService(libroDAO, fichaBibliograficaService);
+        return new LibroService(libroDAO, fichaService);
     }
     
 }

@@ -14,24 +14,12 @@ public class FichaBibliograficaService implements GenericService<FichaBibliograf
     @Override
     public void insertar(FichaBibliografica ficha) throws Exception {
         // Validación de Lógica de Negocio: Campos Obligatorios
-
-        if (ficha.getIsbn() == null || ficha.getIsbn().trim().isEmpty()) {
-            throw new IllegalArgumentException("El ISBN no puede ser nulo o vacío.");
-        }
-        if (ficha.getClasificacionDewey() == null || ficha.getClasificacionDewey().trim().isEmpty()) {
-            throw new IllegalArgumentException("La Clasificación Dewey es obligatoria.");
-        }
-        if (ficha.getIdioma() == null || ficha.getIdioma().trim().isEmpty()) {
-            throw new IllegalArgumentException("El idioma de la ficha no puede ser nulo.");
-        }
-        
-        // Validación adicional (ejemplo: longitud mínima de ISBN)
-        if (ficha.getIsbn().length() < 10) {
-            throw new IllegalArgumentException("El ISBN debe tener al menos 10 caracteres.");
-        }
-
-        System.out.println("Insertando Ficha Bibliográfica con ISBN: " + ficha.getIsbn());
-        
+    // Si ISBN no es nulo/vacío, debe cumplir el formato (ej. longitud mínima)
+        if (ficha.getIsbn() != null && !ficha.getIsbn().trim().isEmpty()) {
+            if (ficha.getIsbn().length() < 10) {
+                throw new IllegalArgumentException("El ISBN debe tener al menos 10 caracteres si se proporciona.");
+            }
+        }        
         // Delegación al DAO
         fichaDAO.insertar(ficha);
     }
