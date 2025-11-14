@@ -3,10 +3,14 @@ package progra2.DAO;
 import java.sql.Connection;
 import java.util.List;
 
+/**
+ * Interfaz genérica que define métodos comunes para trabajar con cualquier entidad.
+ * Sirve como base para evitar repetir código en distintas clases DAO.
+ *
+ * @param <T>  Tipo de entidad manejada por la implementación.
+ */
 public interface GenericDAO<T> {
     
-    // Esta es una interfaz genérica que define métodos comunes para trabajar con cualquier entidad.
-    // Sirve como base para evitar repetir código en distintas clases DAO.
     void insertar(T entidad) throws Exception;
     void insertTx(T entidad, Connection conn) throws Exception;
     void actualizar(T entidad) throws Exception;
