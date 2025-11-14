@@ -27,9 +27,8 @@ public class TestConexion {
                 System.out.println("- Driver: " + meta.getDriverName() + " v" + meta.getDriverVersion());
             }
         } catch (SQLException e) {
-            System.out.println("Error de conexion!");
-            System.out.println("Mensaje: " + e.getMessage());
-            e.printStackTrace();
+            System.out.println("No se pudo conectar a la base de datos.");
+            System.out.println("Motivo: " + e.getMessage());
         }
     }
     

@@ -55,7 +55,7 @@ public class AppMenu {
                 try {
                     MenuDisplay.mostrarMenuPrincipal();
                     int opcion = Integer.parseInt(scanner.nextLine());
-                    processOption(opcion);
+                    processMainOption(opcion);
                 } catch (NumberFormatException e) {
                     System.out.println("Entrada invalida. Por favor, ingrese un numero.");
                 }
@@ -63,24 +63,49 @@ public class AppMenu {
         }
     }
     
-    /**
-     * Procesa la opción seleccionada por el usuario y ejecuta la acción correspondiente.
-     * 
-     * @param opcion número de la opción del menú seleccionada
-     */
-    private void processOption(int opcion) {
+    private void processMainOption(int opcion) {
         switch (opcion) {
-            case 1 -> menuHandler.crearLibro();
-            case 2 -> menuHandler.listarLibros();
-            case 3 -> menuHandler.actualizarLibro();
+            case 1 -> gestionarLibros();
+            case 2 -> verificarConexion();
             case 0 -> {
-                System.out.println("Saliendo...");
+                System.out.println("Saliendo del sistema...");
                 running = false;
             }
             default -> System.out.println("Opcion no valida.");
         }
     }
- 
+    
+    private void gestionarLibros() {
+        boolean enMenuLibros = true;
+        while (enMenuLibros) {
+            try {
+                MenuDisplay.mostrarMenuLibros();
+                int opcion = Integer.parseInt(scanner.nextLine());
+                enMenuLibros = processLibroOption(opcion);
+            } catch (NumberFormatException e) {
+                System.out.println("Entrada invalida. Por favor, ingrese un numero.");
+            }
+        }
+    }
+    
+    private boolean processLibroOption(int opcion) {
+        switch (opcion) {
+            case 1 -> menuHandler.crearLibro();
+            case 2 -> menuHandler.listarLibros();
+            case 3 -> menuHandler.actualizarLibro();
+            case 4 -> menuHandler.eliminarLibro();
+            case 0 -> {
+                return false;
+            }
+            default -> System.out.println("Opcion no valida.");
+        }
+        return true;
+    }
+    
+    private void verificarConexion() {
+        menuHandler.verificarConexion();
+    }
+    
     private FichaBibliograficaService createFichaService(){
         FichaBibliograficaDAO fichaDAO =  new FichaBibliograficaDAO();
         return new FichaBibliograficaService(fichaDAO);
