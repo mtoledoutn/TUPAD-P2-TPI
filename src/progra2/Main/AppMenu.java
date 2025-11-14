@@ -7,18 +7,19 @@ import progra2.Service.FichaBibliograficaService;
 import progra2.Service.LibroService;
 
 /**
- * Controlador principal de la aplicación que gestiona el menú y el flujo de navegación.
- * Inicializa los servicios necesarios y coordina las operaciones del usuario.
+ * Controlador principal del sistema.
+ * Administra el flujo de navegación, inicializa servicios y procesa
+ * las operaciones del menú general y del menú de libros.
  */
 public class AppMenu {
     
-    /** Scanner para leer entrada del usuario desde consola */
+    /** Scanner para leer entrada del usuario desde consola. */
     private final Scanner scanner;
     
-    /** Manejador que procesa las operaciones del menú */
+    /** Manejador que gestiona las acciones seleccionadas por el usuario. */
     private final MenuHandler menuHandler;
     
-    /** Bandera que controla el bucle principal de la aplicación */
+    /** Bandera que controla el bucle principal de la aplicación. */
     private boolean running;
     
     /**
@@ -63,6 +64,7 @@ public class AppMenu {
         }
     }
     
+    /** Método que procesa una opcion del menu principal. */
     private void processMainOption(int opcion) {
         switch (opcion) {
             case 1 -> gestionarLibros();
@@ -75,6 +77,7 @@ public class AppMenu {
         }
     }
     
+    /** Método que controla la navegación dentro del menú de libros. */
     private void gestionarLibros() {
         boolean enMenuLibros = true;
         while (enMenuLibros) {
@@ -88,6 +91,7 @@ public class AppMenu {
         }
     }
     
+    /** Método que procesa las opciones del menú de libros. */
     private boolean processLibroOption(int opcion) {
         switch (opcion) {
             case 1 -> menuHandler.crearLibro();
@@ -102,15 +106,18 @@ public class AppMenu {
         return true;
     }
     
+    /** Método que verifica directamente la conexión a la BD. */
     private void verificarConexion() {
         menuHandler.verificarConexion();
     }
     
+    /** Factoría de servicio de ficha bibliográfica. */
     private FichaBibliograficaService createFichaService(){
         FichaBibliograficaDAO fichaDAO =  new FichaBibliograficaDAO();
         return new FichaBibliograficaService(fichaDAO);
     }
     
+    /** Factoría de servicio de libro. */
     private LibroService createLibroService(FichaBibliograficaService fichaService) {
         LibroDAO libroDAO = new LibroDAO();
         return new LibroService(libroDAO, fichaService);

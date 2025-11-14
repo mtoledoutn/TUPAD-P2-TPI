@@ -1,12 +1,17 @@
 package progra2.Main;
 
 /**
- * Clase utilitaria responsable de mostrar la interfaz de menú en consola.
- * Centraliza la presentación visual del menú principal de la aplicación.
+ * Clase encargada de renderizar los menús de la aplicación en consola.
+ * Centraliza únicamente la presentación visual, sin contener lógica de negocio.
  */
 public class MenuDisplay {
     
-    /** JAVADOC AQUÍ */
+    /** Muestra el menú principal con las opciones iniciales del sistema.
+     * Opciones:
+     * 1. Gestion de libros
+     * 2. Verificar conexión a la Base de Datos
+     * 0. Salir de la aplicación
+     */
     public static void mostrarMenuPrincipal() {
         System.out.println("\n========= SISTEMA DE GESTION DE BIBLIOTECA =========");
         System.out.println("1. Gestionar Libros");
@@ -16,8 +21,14 @@ public class MenuDisplay {
     }
     
     /**
-     * Muestra el menú principal con todas las opciones disponibles.
-     * Incluye operaciones CRUD básicas para libros y opción de salida.
+     * Muestra el menú específico para la gestión de libros con sus operaciones CRUD básicas.
+     * 
+     * Opciones:
+     * 1. Crear
+     * 2. Listar/Buscar
+     * 3. Actualizar
+     * 4. Eliminar
+     * 0. Volver al menú principal
      */
     public static void mostrarMenuLibros() {
         System.out.println("\n========= MENU - Libros =========");
