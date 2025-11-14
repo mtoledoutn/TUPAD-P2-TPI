@@ -2,13 +2,12 @@ package progra2.Service;
 
 import java.util.List;
 import progra2.DAO.FichaBibliograficaDAO;
-import progra2.DAO.GenericDAO;
 import progra2.Models.FichaBibliografica;
 
 public class FichaBibliograficaService implements GenericService<FichaBibliografica>{
-    private final GenericDAO<FichaBibliografica> fichaDAO;
+    private final FichaBibliograficaDAO fichaDAO;
     
-    public FichaBibliograficaService(GenericDAO<FichaBibliografica> fichaDAO) {
+    public FichaBibliograficaService(FichaBibliograficaDAO fichaDAO) {
         this.fichaDAO = fichaDAO;
     }
     
