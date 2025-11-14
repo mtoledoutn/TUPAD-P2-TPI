@@ -36,6 +36,10 @@ public class MenuHandler {
         this.fichaService = fichaService;
     }
     
+    public void verificarConexion() {
+        TestConexion.main(null);
+    }
+    
     /**
      * Flujo interactivo para crear un nuevo libro con su ficha bibliográfica.
      * Captura todos los datos necesarios y persiste el libro en la base de datos.
@@ -65,7 +69,7 @@ public class MenuHandler {
                 System.out.println("Ahora crearemos la ficha bibliografica del libro....");
                 fichaBibliografica = crearFicha();
                 
-                //insertamos ficha en la bd
+                // Insertamos ficha en la bd
                 fichaService.insertar(fichaBibliografica);
                 System.out.println("Ficha creada con ID: " + fichaBibliografica.getId());
             }
@@ -237,12 +241,12 @@ public class MenuHandler {
      */
     public void actualizarLibro() {
         try {
-            System.out.print("ID del libro a a actualizar: ");
+            System.out.print("ID del libro a actualizar: ");
             int id = Integer.parseInt(scanner.nextLine());
             Libro l = libroService.getById(id);
 
             if (l == null) {
-                System.out.println("Libro no encontraado.");
+                System.out.println("Libro no encontrado.");
                 return;
             }
             
@@ -324,7 +328,33 @@ public class MenuHandler {
                 }
             }
         } catch (Exception e) {
-            System.err.println("Error al actualizar persona: " + e.getMessage());
+            System.err.println("Error al actualizar libro: " + e.getMessage());
+        }
+    }
+    
+    public void eliminarLibro() {
+        try {
+            System.out.print("ID del libro a eliminar: ");
+            int id = Integer.parseInt(scanner.nextLine());
+            
+            Libro libro = libroService.getById(id);
+            if (libro == null) {
+                System.out.println("Libro no encontrado.");
+                return;
+            }
+            
+            System.out.println("Libro encontrado: " + libro.getTitulo() + " - " + libro.getAutor());
+            System.out.print("¿Esta seguro que desea eliminar este libro? (S/N): ");
+            String confirmacion = scanner.nextLine().trim().toUpperCase();
+            
+            if (confirmacion.equals("S")) {
+                libroService.eliminar(id);
+                System.out.println("Libro eliminado exitosamente (baja logica).");
+            } else {
+                System.out.println("Operacion cancelada.");
+            }
+        } catch (Exception e) {
+            System.err.println("Error al eliminar libro: " + e.getMessage());
         }
     }
     
