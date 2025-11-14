@@ -7,6 +7,7 @@ import java.sql.SQLException;
 
 /**
  * Clase de prueba para verificar la conexión con la base de datos.
+ * Si la conexión es exitosa, muestra los metadatos de la misma.
  * Utiliza la configuración definida en DatabaseConnection.
  */
 public class TestConexion {
