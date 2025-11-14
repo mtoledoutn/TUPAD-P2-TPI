@@ -252,9 +252,23 @@ public class LibroDAO implements GenericDAO<Libro> {
         stmt.setString(1, libro.getTitulo());
         stmt.setString(2, libro.getAutor());
         stmt.setString(3, libro.getEditorial());
-        stmt.setInt(4, libro.getAnioEdicion());
-        stmt.setInt(5, libro.getFichaBibliografica().getId());
+        
+        
+        //Manejar anio_edicion nulleable
+        if(libro.getAnioEdicion() != null){
+            stmt.setInt(4, libro.getAnioEdicion());
+        }else{
+            stmt.setInt(4, java.sql.Types.INTEGER);
+        }
+        
+        //Manejar fichaBibliografica_id nulleable
+        if (libro.getFichaBibliografica() != null && libro.getFichaBibliografica().getId() > 0) {
+            stmt.setInt(5, libro.getFichaBibliografica().getId());
+        }else{
+            stmt.setInt(5, java.sql.Types.INTEGER);
+        }
     }
+    
     
     /** JAVADOC AQUÍ */  
     private void setGeneratedId(PreparedStatement stmt, Libro libro) throws SQLException {
@@ -269,24 +283,29 @@ public class LibroDAO implements GenericDAO<Libro> {
     
     /** JAVADOC AQUÍ */
     private Libro mapResultSetToLibro(ResultSet rs) throws SQLException {
-        // Construir la ficha bibliográfica asociada
-        FichaBibliografica ficha = new FichaBibliografica(
+        FichaBibliografica ficha = null;
+        // Solo crear ficha si existe en la BD
+        int fichaId = rs.getInt("ficha_id");
+        if (!rs.wasNull() && fichaId > 0) { //Verifical si no es null
+            ficha = new FichaBibliografica (
                 null,
                 rs.getString("clasificacion_dewey"),
                 rs.getString("estanteria"),
                 rs.getString("idioma"),
-                rs.getInt("Ficha_id"),
-                false
+                fichaId,
+                rs.getBoolean("ficha_eliminado")
         );
         
+        }
+       
         // Construir y retornar el libro
         return new Libro(
                 rs.getInt("id"),
                 rs.getString("titulo"),
                 rs.getString("autor"),
                 rs.getString("editorial"),
-                rs.getInt("anio_edicion"),
-                ficha
+                (Integer)rs.getInt("anio_edicion"), //puede ser null
+                ficha //puede ser null
         );
     }
     
