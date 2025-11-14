@@ -163,7 +163,13 @@ public class MenuHandler {
      */
     public void listarLibros() {
         try {
-            System.out.print("¿Desea (1) listar todos o (2) buscar por autor (3) titulo (4) año de publicacion (5) idioma? Ingrese opcion: ");
+            System.out.println("\n¿Como desea listar los libros?:");
+            System.out.println(" 1) Listar todos");
+            System.out.println(" 2) Por autor");
+            System.out.println(" 3) Por titulo");
+            System.out.println(" 4) Por año de publicacion");
+            System.out.println(" 5) Por idioma");
+            System.out.print("Opcion: ");
             int subopcion = Integer.parseInt(scanner.nextLine());
 
             List<Libro> libros;
@@ -173,33 +179,33 @@ public class MenuHandler {
             switch (subopcion) {
                 case 1 -> libros = libroService.getAll();
                 case 2 -> {
-                    System.out.print("Ingrese autor a buscar: ");
+                    System.out.print("\nIngrese autor a buscar: ");
                     filtro = scanner.nextLine().trim();
                     libros = libroService.buscarPorAutor(filtro);
                 }
                 case 3 -> {
-                    System.out.print("Ingrese titulo del libro a buscar: ");
+                    System.out.print("\nIngrese titulo del libro a buscar: ");
                     filtro = scanner.nextLine().trim();
                     libros = libroService.buscarPorTitulo(filtro);
                 }
                 case 4 -> {
-                    System.out.print("Ingrese año de publicacion a buscar: ");
+                    System.out.print("\nIngrese año de publicacion a buscar: ");
                     filtro = scanner.nextLine().trim();
                     libros = libroService.buscarPorAnioPublicacion(filtro);
                 }
                 case 5 -> {
-                    System.out.print("Ingrese idioma a buscar: ");
+                    System.out.print("\nIngrese idioma a buscar: ");
                     filtro = scanner.nextLine().trim();
                     libros = libroService.buscarPorIdioma(filtro);
                 }
                 default -> {
-                    System.out.println("Opcion invalida.");
+                    System.out.println("\nOpcion invalida.");
                     return;
                 }
             }
             
             if (libros.isEmpty()) {
-                System.out.println("No se encontraron libros.");
+                System.out.println("\nNo se encontraron libros.");
                 return;
             }
             
