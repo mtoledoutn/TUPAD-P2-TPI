@@ -10,6 +10,7 @@ import progra2.Service.LibroService;
 /**
  * Controlador de operaciones del menú que procesa las interacciones del usuario.
  * Funciona como puente entre la capa de presentación (menu) y la capa de negocio (services).
+ * Maneja validación de entrada y bucles de reintento.
  */
 public class MenuHandler {
     
@@ -56,37 +57,32 @@ public class MenuHandler {
      */
     public void crearLibro() {
         try {
-            // Captura de datos del libro
-            System.out.print("Titulo: ");
-            String titulo = scanner.nextLine().trim();
-            System.out.print("Autor: ");
-            String autor = scanner.nextLine().trim();
-            System.out.print("Editorial: ");
-            String editorial = scanner.nextLine().trim();
-            System.out.print("Año de edicion: ");
-
-            int anio_edicion = Integer.parseInt(scanner.nextLine().trim());
+            System.out.println("\n========= CREAR LIBRO =========");
             
-            // Opcion: crear libro con o sin ficha
+            // Captura de datos del libro con validaciones
+            String titulo = leerTextoObligatorio("Titulo");
+            String autor = leerTextoObligatorio("Autor");
+            String editorial = leerTextoOpcional("Editorial");
+            Integer anioEdicion = leerAnioEdicion();
             
-            System.out.println("Desea crear una ficha bibliografica para el libro? (S/N): ");
+            // Opción: crear libro con o sin ficha
+            System.out.print("¿Desea crear una ficha bibliografica para el libro? (S/N): ");
             String respuesta = scanner.nextLine().trim().toUpperCase();
 
             FichaBibliografica fichaBibliografica = null;
             
             if (respuesta.equals("S")) {
-                System.out.println("Ahora crearemos la ficha bibliografica del libro....");
+                System.out.println("\n--- Creando ficha bibliografica ---");
                 fichaBibliografica = crearFicha();
-                
-                // Insertamos ficha en la bd
                 fichaService.insertar(fichaBibliografica);
                 System.out.println("Ficha creada con ID: " + fichaBibliografica.getId());
             }
             
             // Construcción e inserción del libro
-            Libro libro = new Libro(0, titulo, autor, editorial, anio_edicion, fichaBibliografica);
+            Libro libro = new Libro(0, titulo, autor, editorial, anioEdicion, fichaBibliografica);
             libroService.insertar(libro);
             System.out.println("Libro creado exitosamente con ID: " + libro.getId());
+            
         } catch (Exception e) {
             System.err.println("Error al crear libro: " + e.getMessage());
         }
@@ -98,23 +94,15 @@ public class MenuHandler {
      * @return instancia de FichaBibliografica con los datos capturados
      */
     private FichaBibliografica crearFicha() {
-        System.out.print("ISBN: ");
-        String isbn = scanner.nextLine().trim();
-        System.out.print("Clasificacion Dewey: ");
-        String clasificacionDewey = scanner.nextLine().trim();
-        System.out.print("Estanteria: ");
-        String estanteria = scanner.nextLine().trim();
-        System.out.print("idioma: ");
-        String idioma = scanner.nextLine().trim();
+        String isbn = leerISBN();
+        String clasificacionDewey = leerTextoOpcional("Clasificacion Dewey");
+        String estanteria = leerTextoOpcional("Estanteria");
+        String idioma = leerTextoOpcional("Idioma");
+        
         return new FichaBibliografica(isbn, clasificacionDewey, estanteria, idioma, 0, false);
     }
     
-    /**
-     * Flujo interactivo para actualizar campos individuales de una ficha bibliográfica.
-     * Permite modificar múltiples campos en una sola sesión.
-     * 
-     * @param f ficha bibliográfica a actualizar
-     */
+    /** Flujo interactivo para actualizar campos individuales de una ficha bibliográfica. */
     private void updateFichaById(FichaBibliografica f) {
         if (f == null) {
             System.out.println("La ficha bibliográfica no existe.");
@@ -123,205 +111,185 @@ public class MenuHandler {
         
         // Bucle de actualización hasta que el usuario decida volver
         while (true) {
-            System.out.println("\nFicha actual: ISBN='" + f.getIsbn() + "', Dewey='" + f.getClasificacionDewey() + "', Estanteria='" + f.getEstanteria() + "', Idioma='" + f.getIdioma() + "'");
-            System.out.println("Seleccione atributo a actualizar:");
-            System.out.println(" 1) ISBN");
-            System.out.println(" 2) Clasificacion Dewey");
-            System.out.println(" 3) Estanteria");
-            System.out.println(" 4) Idioma");
-            System.out.println(" 5) Volver");
-            System.out.print("Opcion ficha: ");
-
-            String fo = scanner.nextLine().trim();
-            int foInt;
-            try {
-                foInt = Integer.parseInt(fo);
-            } catch (NumberFormatException ex) {
-                System.out.println("Opcion invalida.");
-                continue;
-            }
-
-            if (foInt == 5) break;
+            System.out.println("\n--- Ficha Actual ---");
+            System.out.println("ISBN: " + f.getIsbn());
+            System.out.println("Clasificacion Dewey: " + f.getClasificacionDewey());
+            System.out.println("Estanteria: " + f.getEstanteria());
+            System.out.println("Idioma: " + f.getIdioma());
             
-            // Actualización selectiva de campos
-            switch (foInt) {
+            System.out.println("\nSeleccione campo a actualizar:");
+            System.out.println("1. ISBN");
+            System.out.println("2. Clasificacion Dewey");
+            System.out.println("3. Estanteria");
+            System.out.println("4. Idioma");
+            System.out.println("0. Volver");
+            System.out.print("Opcion: ");
+
+            int opcion = leerOpcionMenu(0, 4);
+            if (opcion == 0) break;
+            
+            switch (opcion) {
                 case 1 -> {
-                    System.out.print("Nuevo ISBN (actual: " + f.getIsbn() + ", Enter para mantener): ");
+                    System.out.print("Nuevo ISBN (Enter para mantener actual): ");
                     String isbn = scanner.nextLine().trim();
                     if (!isbn.isEmpty()) f.setIsbn(isbn);
                 }
                 case 2 -> {
-                    System.out.print("Nueva clasificacion Dewey (actual: " + f.getClasificacionDewey() + ", Enter para mantener): ");
+                    System.out.print("Nueva clasificacion Dewey (Enter para mantener): ");
                     String dewey = scanner.nextLine().trim();
                     if (!dewey.isEmpty()) f.setClasificacionDewey(dewey);
                 }
                 case 3 -> {
-                    System.out.print("Nueva estanteria (actual: " + f.getEstanteria() + ", Enter para mantener): ");
+                    System.out.print("Nueva estanteria (Enter para mantener): ");
                     String est = scanner.nextLine().trim();
                     if (!est.isEmpty()) f.setEstanteria(est);
                 }
                 case 4 -> {
-                    System.out.print("Nuevo idioma (actual: " + f.getIdioma() + ", Enter para mantener): ");
+                    System.out.print("Nuevo idioma (Enter para mantener): ");
                     String idioma = scanner.nextLine().trim();
                     if (!idioma.isEmpty()) f.setIdioma(idioma);
                 }
-                default -> System.out.println("Opcion invalida.");
             }
         }
     }
     
-    /**
-     * Lista libros según diferentes criterios de búsqueda.
-     * Permite listar todos los libros o filtrar por autor, título, año o idioma.
-     */
+    /* ERRORES QUE VOY VIENDO
+    - 1 Listar todos me sale -> Error al listar libros: Cannot invoke "java.lang.Integer.intValue()" because "anioEdicion" is null
+    */
+    
+    /** Lista libros según diferentes criterios de búsqueda. */
     public void listarLibros() {
         try {
-            System.out.println("\n¿Como desea listar los libros?:");
-            System.out.println(" 1) Listar todos");
-            System.out.println(" 2) Por autor");
-            System.out.println(" 3) Por titulo");
-            System.out.println(" 4) Por año de publicacion");
-            System.out.println(" 5) Por idioma");
+            System.out.println("\n========= LISTAR/BUSCAR LIBROS =========");
+            System.out.println("1. Listar todos");
+            System.out.println("2. Buscar por autor");
+            System.out.println("3. Buscar por titulo");
+            System.out.println("4. Buscar por año de publicacion");
+            System.out.println("5. Buscar por idioma");
+            System.out.println("0. Volver");
             System.out.print("Opcion: ");
-            int subopcion = Integer.parseInt(scanner.nextLine());
+            
+            int opcion = leerOpcionMenu(0, 5);
+            if (opcion == 0) return;
 
             List<Libro> libros;
-            String filtro;
             
-            // Selección de estrategia de búsqueda
-            switch (subopcion) {
+            switch (opcion) {
                 case 1 -> libros = libroService.getAll();
                 case 2 -> {
-                    System.out.print("\nIngrese autor a buscar: ");
-                    filtro = scanner.nextLine().trim();
-                    libros = libroService.buscarPorAutor(filtro);
+                    String autor = leerTextoObligatorio("Autor a buscar");
+                    libros = libroService.buscarPorAutor(autor);
                 }
                 case 3 -> {
-                    System.out.print("\nIngrese titulo del libro a buscar: ");
-                    filtro = scanner.nextLine().trim();
-                    libros = libroService.buscarPorTitulo(filtro);
+                    String titulo = leerTextoObligatorio("Titulo a buscar");
+                    libros = libroService.buscarPorTitulo(titulo);
                 }
                 case 4 -> {
-                    System.out.print("\nIngrese año de publicacion a buscar: ");
-                    filtro = scanner.nextLine().trim();
-                    libros = libroService.buscarPorAnioPublicacion(filtro);
+                    int anio = leerAnioObligatorio("Año de publicacion a buscar");
+                    libros = libroService.buscarPorAnioPublicacion(anio);
                 }
                 case 5 -> {
-                    System.out.print("\nIngrese idioma a buscar: ");
-                    filtro = scanner.nextLine().trim();
-                    libros = libroService.buscarPorIdioma(filtro);
+                    String idioma = leerTextoObligatorio("Idioma a buscar");
+                    libros = libroService.buscarPorIdioma(idioma);
                 }
                 default -> {
-                    System.out.println("\nOpcion invalida.");
+                    System.out.println("Opcion invalida.");
                     return;
                 }
             }
             
             if (libros.isEmpty()) {
-                System.out.println("\nNo se encontraron libros.");
+                System.out.println("No se encontraron libros.");
                 return;
             }
             
-            // Impresión de resultados con datos de ficha bibliográfica
+            System.out.println("\n========= RESULTADOS (" + libros.size() + ") =========");
             for (Libro l : libros) {
-                System.out.println("ID: " + l.getId()
-                        + ", Titulo: " + l.getTitulo()
-                        + ", Autor: " + l.getAutor()
-                        + ", Editorial: " + l.getEditorial()
-                        + ", Año: " + l.getAnioEdicion());
+                System.out.println("\nID: " + l.getId());
+                System.out.println("  Titulo: " + l.getTitulo());
+                System.out.println("  Autor: " + l.getAutor());
+                System.out.println("  Editorial: " + (l.getEditorial() != null ? l.getEditorial() : "N/A"));
+                System.out.println("  Año: " + (l.getAnioEdicion() != null ? l.getAnioEdicion() : "N/A"));
                 
                 FichaBibliografica f = l.getFichaBibliografica();
                 if (f != null) {
-                    System.out.println("   ISBN: " + f.getIsbn()
-                            + ", Dewey: " + f.getClasificacionDewey()
-                            + ", Estanteria: " + f.getEstanteria()
-                            + ", Idioma: " + f.getIdioma());
+                    System.out.println("  [FICHA]");
+                    System.out.println("    ISBN: " + (f.getIsbn() != null ? f.getIsbn() : "N/A"));
+                    System.out.println("    Dewey: " + (f.getClasificacionDewey() != null ? f.getClasificacionDewey() : "N/A"));
+                    System.out.println("    Estanteria: " + (f.getEstanteria() != null ? f.getEstanteria() : "N/A"));
+                    System.out.println("    Idioma: " + (f.getIdioma() != null ? f.getIdioma() : "N/A"));
                 }
             }
         } catch (Exception e) {
-            System.err.println("Error al listar personas: " + e.getMessage());
+            System.err.println("Error al listar libros: " + e.getMessage());
         }
     }
     
-    /**
-     * Flujo interactivo para actualizar un libro existente.
-     * Permite modificar campos del libro y su ficha bibliográfica asociada.
-     * Los cambios no se persisten hasta confirmar explícitamente.
-     */
+    /** Flujo interactivo para actualizar un libro existente. */
     public void actualizarLibro() {
         try {
-            System.out.print("ID del libro a actualizar: ");
-            int id = Integer.parseInt(scanner.nextLine());
+            System.out.println("\n========= ACTUALIZAR LIBRO =========");
+            int id = leerIdPositivo("ID del libro a actualizar");
+            
             Libro l = libroService.getById(id);
-
             if (l == null) {
                 System.out.println("Libro no encontrado.");
                 return;
             }
             
-            // Bucle de actualización con menú de campos modificables
             while (true) {
-                System.out.println("\nLibro encontrado: ID=" + l.getId() + ", Titulo='" + l.getTitulo() + "', Autor='" + l.getAutor() + "', Editorial='" + l.getEditorial() + "', Año='" + l.getAnioEdicion() + "'");
-                System.out.println("Seleccione campo a actualizar:");
-                System.out.println(" 1) Titulo");
-                System.out.println(" 2) Autor");
-                System.out.println(" 3) Editorial");
-                System.out.println(" 4) Año de edicion");
-                System.out.println(" 5) Ficha bibliográfica (ISBN/Dewey/Estanteria/Idioma)");
-                System.out.println(" 6) Guardar cambios y salir");
-                System.out.println(" 7) Cancelar sin guardar");
+                System.out.println("\n--- Libro Actual ---");
+                System.out.println("ID: " + l.getId());
+                System.out.println("Titulo: " + l.getTitulo());
+                System.out.println("Autor: " + l.getAutor());
+                System.out.println("Editorial: " + l.getEditorial());
+                System.out.println("Año: " + l.getAnioEdicion());
+                
+                System.out.println("\nSeleccione campo a actualizar:");
+                System.out.println("1. Titulo");
+                System.out.println("2. Autor");
+                System.out.println("3. Editorial");
+                System.out.println("4. Año de edicion");
+                System.out.println("5. Ficha bibliografica");
+                System.out.println("6. Guardar cambios y salir");
+                System.out.println("0. Cancelar sin guardar");
                 System.out.print("Opcion: ");
 
-                String optStr = scanner.nextLine().trim();
-                int opt;
-                try {
-                    opt = Integer.parseInt(optStr);
-                } catch (NumberFormatException nfe) {
-                    System.out.println("Opcion invalida.");
-                    continue;
-                }
+                int opt = leerOpcionMenu(0, 6);
                 
-                // Procesamiento de la opción seleccionada
                 switch (opt) {
+                    case 0 -> {
+                        System.out.println("Operacion cancelada.");
+                        return;
+                    }
                     case 1 -> {
-                        System.out.print("Nuevo titulo (actual: " + l.getTitulo() + ", Enter para mantener): ");
-                        String nuevoTitulo = scanner.nextLine().trim();
-                        if (!nuevoTitulo.isEmpty()) {
-                            l.setTitulo(nuevoTitulo);
-                        }
+                        String titulo = leerTextoObligatorio("Nuevo titulo");
+                        l.setTitulo(titulo);
                     }
                     case 2 -> {
-                        System.out.print("Nuevo autor (actual: " + l.getAutor() + ", Enter para mantener): ");
-                        String nuevoAutor = scanner.nextLine().trim();
-                        if (!nuevoAutor.isEmpty()) {
-                            l.setAutor(nuevoAutor);
-                        }
+                        String autor = leerTextoObligatorio("Nuevo autor");
+                        l.setAutor(autor);
                     }
                     case 3 -> {
-                        System.out.print("Nueva editorial (actual: " + l.getEditorial() + ", Enter para mantener): ");
-                        String nuevaEditorial = scanner.nextLine().trim();
-                        if (!nuevaEditorial.isEmpty()) {
-                            l.setEditorial(nuevaEditorial);
-                        }
+                        String editorial = leerTextoOpcional("Nueva editorial");
+                        l.setEditorial(editorial);
                     }
                     case 4 -> {
-                        System.out.print("Nuevo año de edicion (actual: " + l.getAnioEdicion() + ", Enter para mantener): ");
-                        String anioStr = scanner.nextLine().trim();
-                        if (!anioStr.isEmpty()) {
-                            try {
-                                int anio = Integer.parseInt(anioStr);
-                                l.setAnioEdicion(anio);
-                            } catch (NumberFormatException nfe) {
-                                System.out.println("Año inválido, no se actualizó.");
-                            }
-                        }
+                        Integer anio = leerAnioEdicion();
+                        l.setAnioEdicion(anio);
                     }
                     case 5 -> {
                         FichaBibliografica f = l.getFichaBibliografica();
                         if (f == null) {
-                            System.out.println("Ficha bibliográfica ausente para este libro.");
+                            System.out.println("Este libro no tiene ficha bibliografica asociada.");
                         } else {
                             updateFichaById(f);
+                            try {
+                                fichaService.actualizar(f);
+                                System.out.println("Ficha actualizada.");
+                            } catch (Exception e) {
+                                System.err.println("Error al actualizar ficha: " + e.getMessage());
+                            }
                         }
                     }
                     case 6 -> {
@@ -329,11 +297,6 @@ public class MenuHandler {
                         System.out.println("Libro actualizado exitosamente.");
                         return;
                     }
-                    case 7 -> {
-                        System.out.println("Operacion cancelada. No se guardaron cambios.");
-                        return;
-                    }
-                    default -> System.out.println("Opcion invalida.");
                 }
             }
         } catch (Exception e) {
@@ -341,10 +304,11 @@ public class MenuHandler {
         }
     }
     
+    /** Flujo interactivo para eliminar un libro. */
     public void eliminarLibro() {
         try {
-            System.out.print("ID del libro a eliminar: ");
-            int id = Integer.parseInt(scanner.nextLine());
+            System.out.println("\n========= ELIMINAR LIBRO =========");
+            int id = leerIdPositivo("ID del libro a eliminar");
             
             Libro libro = libroService.getById(id);
             if (libro == null) {
@@ -352,18 +316,165 @@ public class MenuHandler {
                 return;
             }
             
-            System.out.println("Libro encontrado: " + libro.getTitulo() + " - " + libro.getAutor());
-            System.out.print("¿Esta seguro que desea eliminar este libro? (S/N): ");
+            System.out.println("\nLibro encontrado:");
+            System.out.println("  " + libro.getTitulo() + " - " + libro.getAutor());
+            System.out.print("\n¿Esta seguro que desea eliminarlo? (S/N): ");
             String confirmacion = scanner.nextLine().trim().toUpperCase();
             
             if (confirmacion.equals("S")) {
                 libroService.eliminar(id);
-                System.out.println("Libro eliminado exitosamente (baja logica).");
+                System.out.println("Libro eliminado exitosamente.");
             } else {
                 System.out.println("Operacion cancelada.");
             }
         } catch (Exception e) {
             System.err.println("Error al eliminar libro: " + e.getMessage());
+        }
+    }
+    
+    
+    // =================== Métodos Auxiliares de Validación ===================
+    
+    /**
+     * Lee una opción de menú válida dentro de un rango específico.
+     * Repite hasta obtener un número válido o que el usuario ingrese 0 para salir.
+     */
+    private int leerOpcionMenu(int min, int max) {
+        while (true) {
+            try {
+                String input = scanner.nextLine().trim();
+                if (input.isEmpty()) {
+                    System.out.print("Opcion no puede estar vacia. Ingrese un numero (0 para salir): ");
+                    continue;
+                }
+                
+                int opcion = Integer.parseInt(input);
+                if (opcion >= min && opcion <= max) {
+                    return opcion;
+                }
+                System.out.print("Opcion invalida. Ingrese un numero entre " + min + " y " + max + ": ");
+            } catch (NumberFormatException e) {
+                System.out.print("Entrada invalida. Ingrese un numero (0 para salir): ");
+            }
+        }
+    }
+    
+    /** Lee un ID positivo mayor a cero, repitiendo hasta obtener un valor válido. */
+    private int leerIdPositivo(String mensaje) {
+        while (true) {
+            try {
+                System.out.print(mensaje + " (0 para cancelar): ");
+                String input = scanner.nextLine().trim();
+                
+                if (input.isEmpty()) {
+                    System.out.println("El ID no puede estar vacio.");
+                    continue;
+                }
+                
+                int id = Integer.parseInt(input);
+                if (id == 0) {
+                    throw new RuntimeException("Operacion cancelada por el usuario");
+                }
+                if (id > 0) {
+                    return id;
+                }
+                System.out.println("El ID debe ser un numero positivo mayor a cero.");
+            } catch (NumberFormatException e) {
+                System.out.println("Entrada invalida. Debe ingresar un numero entero.");
+            }
+        }
+    }
+    
+    /** Lee un texto obligatorio (no puede estar vacío). */
+    private String leerTextoObligatorio(String campo) {
+        while (true) {
+            System.out.print(campo + ": ");
+            String texto = scanner.nextLine().trim();
+            if (!texto.isEmpty()) {
+                return texto;
+            }
+            System.out.println("El campo " + campo + " es obligatorio.");
+        }
+    }
+    
+    /** Lee un texto opcional (puede estar vacío, retorna null). */
+    private String leerTextoOpcional(String campo) {
+        System.out.print(campo + " (Enter para omitir): ");
+        String texto = scanner.nextLine().trim();
+        return texto.isEmpty() ? null : texto;
+    }
+    
+    /** Lee un año de edición válido (opcional). */
+    private Integer leerAnioEdicion() {
+        while (true) {
+            System.out.print("Año de edicion (Enter para omitir, 0 para cancelar): ");
+            String input = scanner.nextLine().trim();
+            
+            if (input.isEmpty()) {
+                return null; // Opcional
+            }
+            
+            try {
+                int anio = Integer.parseInt(input);
+                if (anio == 0) {
+                    return null;
+                }
+                
+                int anioActual = java.time.Year.now().getValue();
+                if (anio >= 1000 && anio <= anioActual) {
+                    return anio;
+                }
+                System.out.println("El año debe estar entre 1000 y " + anioActual + ".");
+            } catch (NumberFormatException e) {
+                System.out.println("Entrada invalida. Debe ingresar un numero entero.");
+            }
+        }
+    }
+    
+    /** Lee un año obligatorio (para búsquedas). */
+    private int leerAnioObligatorio(String mensaje) {
+        while (true) {
+            System.out.print(mensaje + " (0 para cancelar): ");
+            String input = scanner.nextLine().trim();
+            
+            if (input.isEmpty()) {
+                System.out.println("El año es obligatorio.");
+                continue;
+            }
+            
+            try {
+                int anio = Integer.parseInt(input);
+                if (anio == 0) {
+                    throw new RuntimeException("Operacion cancelada por el usuario");
+                }
+                
+                int anioActual = java.time.Year.now().getValue();
+                if (anio >= 1000 && anio <= anioActual) {
+                    return anio;
+                }
+                System.out.println("El año debe estar entre 1000 y " + anioActual + ".");
+            } catch (NumberFormatException e) {
+                System.out.println("Entrada invalida. Debe ingresar un numero entero.");
+            }
+        }
+    }
+    
+    /** Lee un ISBN con validación de formato básica. */
+    private String leerISBN() {
+        while (true) {
+            System.out.print("ISBN (Enter para omitir): ");
+            String isbn = scanner.nextLine().trim();
+            
+            if (isbn.isEmpty()) {
+                return null;
+            }
+            
+            // Validación básica de longitud
+            String isbnSinGuiones = isbn.replace("-", "");
+            if (isbnSinGuiones.length() == 10 || isbnSinGuiones.length() == 13) {
+                return isbn;
+            }
+            System.out.println("ISBN invalido. Debe tener 10 o 13 digitos (ej: 978-3-16-148410-0).");
         }
     }
     
