@@ -41,15 +41,15 @@ public final class DatabaseConnection {
     /** JAVADOC AQUÍ */
     private static void validateConfiguration() {
         if (URL == null || URL.trim().isEmpty()) {
-            throw new IllegalStateException("La URL de la base de datos no está configurada");
+            throw new IllegalStateException("La URL de la base de datos no esta configurada");
         }
         if (USER == null || USER.trim().isEmpty()) {
-            throw new IllegalStateException("El usuario de la base de datos no está configurado");
+            throw new IllegalStateException("El usuario de la base de datos no esta configurado");
         }
         // PASSWORD puede ser vacío (común en MySQL local con usuario root sin contraseña)
         // Solo validamos que no sea null
         if (PASSWORD == null) {
-            throw new IllegalStateException("La contraseña de la base de datos no está configurada");
+            throw new IllegalStateException("La contraseña de la base de datos no esta configurada");
         }
     }
     

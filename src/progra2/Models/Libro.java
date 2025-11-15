@@ -2,11 +2,15 @@ package progra2.Models;
 
 public class Libro extends BaseModel {
     
-    /** Atributos del modelo de Libro */
+    /** JAVADOC AQUÍ */
     private String titulo;
+    /** JAVADOC AQUÍ */
     private String autor;
+    /** JAVADOC AQUÍ */
     private String editorial;
+    /** JAVADOC AQUÍ */
     private Integer anioEdicion;
+    /** JAVADOC AQUÍ */
     private FichaBibliografica fichaBibliografica;
     
     /** 

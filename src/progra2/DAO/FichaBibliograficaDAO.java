@@ -21,53 +21,62 @@ public class FichaBibliograficaDAO implements GenericDAO<FichaBibliografica> {
     private static final String SELECT_ALL_SQL = "SELECT * FROM ficha_bibliografica WHERE eliminado = FALSE";
     /** JAVADOC AQUI */ 
     private static final String EXISTS_ISBN_SQL = "SELECT COUNT(*) FROM ficha_bibliografica WHERE isbn = ? AND eliminado = FALSE";
+    /** JAVADOC AQUI */ 
+    private static final String EXISTS_ISBN_EXCEPT_ID_SQL = "SELECT COUNT(*) FROM ficha_bibliografica WHERE isbn = ? AND id != ? AND eliminado = FALSE";
     
-    //Metodos con conexion propia
+    
+    // ===================== Métodos con conexion propia =====================
+    
+    /** JAVADOC AQUI */
     @Override
-    public void insertar(FichaBibliografica fichaBibliografica) throws SQLException{
-        try (Connection conn = DatabaseConnection.getConnection()){
+    public void insertar(FichaBibliografica fichaBibliografica) throws SQLException {
+        try (Connection conn = DatabaseConnection.getConnection()) {
             insertar(fichaBibliografica, conn);
         }
     }
+    
+    /** JAVADOC AQUI */
     @Override
-    public void actualizar(FichaBibliografica ficha) throws SQLException{
-        try (Connection conn = DatabaseConnection.getConnection()){
+    public void actualizar(FichaBibliografica ficha) throws SQLException {
+        try (Connection conn = DatabaseConnection.getConnection()) {
             actualizar(ficha, conn);
         }
     }
     
+    /** JAVADOC AQUI */
     @Override
-    public void eliminar(int id) throws SQLException{
-        try (Connection conn = DatabaseConnection.getConnection()){
-            eliminar(id,conn);
+    public void eliminar(int id) throws SQLException {
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            eliminar(id, conn);
         }
     }
     
+    /** JAVADOC AQUI */
     @Override
-    public FichaBibliografica getById(int id) throws SQLException{
-        try (Connection conn = DatabaseConnection.getConnection()){
+    public FichaBibliografica getById(int id) throws SQLException {
+        try (Connection conn = DatabaseConnection.getConnection()) {
             return getById(id, conn);
         }
     }
     
+    /** JAVADOC AQUI */
     @Override
     public List<FichaBibliografica> getAll() throws SQLException {
-        try (Connection conn = DatabaseConnection.getConnection()){
-        return getAll(conn);
-     }
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            return getAll(conn);
+        }
     }
     
     
-    // Metodos con conexion externa (original)
+    // ================ Métodos con conexion externa (original) ================
     
     /**
-     * inserta una ficha usando una conexion externa (para transacciones).
+     * Inserta una ficha usando una conexion externa (para transacciones).
      * @param ficha la ficha a insertar
      * @param conn la conexion de base de datos (manejada externamente)
      */
-    
     public void insertar(FichaBibliografica ficha, Connection conn) throws SQLException {
-           try (PreparedStatement stmt = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement stmt = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
             
             setFichaParameters(stmt, ficha);
             stmt.executeUpdate();
@@ -76,15 +85,12 @@ public class FichaBibliograficaDAO implements GenericDAO<FichaBibliografica> {
     }
     
     /** JAVADOC AQUÍ */
-    
-    //Actualiza una ficha usando una conexion externa (para transacciones)
-    
     public void actualizar(FichaBibliografica ficha, Connection conn) throws SQLException {
-             try (PreparedStatement stmt = conn.prepareStatement(UPDATE_SQL)) {
-
+        try (PreparedStatement stmt = conn.prepareStatement(UPDATE_SQL)) {
+            
             setFichaParameters(stmt, ficha);
             stmt.setInt(5, ficha.getId());
-
+            
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected == 0) {
                 throw new SQLException("No se pudo actualizar la ficha con ID: " + ficha.getId());
@@ -93,23 +99,21 @@ public class FichaBibliograficaDAO implements GenericDAO<FichaBibliografica> {
     }
     
     /** JAVADOC AQUÍ */
-    // Elimina una ficha usando una conexion externa (para transacciones).
     public void eliminar(int id, Connection conn) throws SQLException {
-            try (PreparedStatement stmt = conn.prepareStatement(DELETE_SQL)) {
-
+        try (PreparedStatement stmt = conn.prepareStatement(DELETE_SQL)) {
+                
             stmt.setInt(1, id);
             
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected == 0) {
-                throw new SQLException("No se encontró ficha con ID: " + id);
+                throw new SQLException("No se encontro ficha con ID: " + id);
             }
         }
     }
     
     /** JAVADOC AQUÍ */
-    // Obtiene una ficha por ID usando una conexion externa.
     public FichaBibliografica getById(int id, Connection conn) throws SQLException {
-             try(PreparedStatement stmt = conn.prepareStatement(SELECT_BY_ID_SQL)) {
+        try (PreparedStatement stmt = conn.prepareStatement(SELECT_BY_ID_SQL)) {
 
             stmt.setInt(1, id);
 
@@ -123,14 +127,12 @@ public class FichaBibliograficaDAO implements GenericDAO<FichaBibliografica> {
     }
     
     /** JAVADOC AQUÍ */
-    // Obtiene todas las fichas usando una conexion externa.
     public List<FichaBibliografica> getAll(Connection conn) throws SQLException {
         List<FichaBibliografica> fichas = new ArrayList<>();
         
-        try (
-             Statement stmt = conn.createStatement();
+        try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(SELECT_ALL_SQL)) {
-
+            
             while (rs.next()) {
                 fichas.add(mapResultSetToFicha(rs));
             }
@@ -138,56 +140,49 @@ public class FichaBibliograficaDAO implements GenericDAO<FichaBibliografica> {
         return fichas;
     }
     
-    // Metodos de validacion
+    // ======================== Métodos de validacion ========================
     
     /**
      * Verifica si ya existe una ficha con el ISBN dado.
      * @param isbn el ISBN a verificar
      * @return true si exise, false en caso contrario
      */
-    
-    public boolean existeISBN(String isbn) throws SQLException{
-        if (isbn == null || isbn.trim().isEmpty()){
+    public boolean existeISBN(String isbn) throws SQLException {
+        if (isbn == null || isbn.trim().isEmpty()) {
             return false;
         }
         
-        
         try (Connection conn = DatabaseConnection.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(EXISTS_ISBN_SQL)){
+             PreparedStatement stmt = conn.prepareStatement(EXISTS_ISBN_SQL)) {
             
             stmt.setString(1, isbn);
             
-            try (ResultSet rs = stmt.executeQuery()){
+            try (ResultSet rs = stmt.executeQuery()) {
                 return rs.next() && rs.getInt(1) > 0;
             }
         }
-        
     }
     
-    
-    //Verifica si existe un ISBN diferente al de la ficha actual (para actualizaciones)
-    
-    public boolean existeISBNExceptoId(String isbn , int idActual) throws SQLException{
-        if(isbn == null || isbn.trim().isEmpty()){
+    /** JAVADOC AQUÍ */
+    public boolean existeISBNExceptoId(String isbn , int idActual) throws SQLException {
+        if (isbn == null || isbn.trim().isEmpty()) {
             return false;
         }
         
-        String sql = "SELECT COUNT(*) FROM ficha_bibliografica WHERE isbn = ? AND id != ? AND eliminado = FALSE";
-        
-        try(Connection conn = DatabaseConnection.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(sql)){
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(EXISTS_ISBN_EXCEPT_ID_SQL)) {
             
             stmt.setString(1, isbn);
             stmt.setInt(2, idActual);
             
-            try(ResultSet rs = stmt.executeQuery()){
+            try (ResultSet rs = stmt.executeQuery()) {
                 return rs.next() && rs.getInt(1) > 0;
             }
         }
     }
     
     
-    //metodos auxiliares privados
+    // ===================== Métodos auxiliares privados =====================
     
     /** JAVADOC AQUÍ */
     private void setFichaParameters(PreparedStatement stmt, FichaBibliografica fichaBibliografica) throws SQLException {
@@ -203,7 +198,7 @@ public class FichaBibliograficaDAO implements GenericDAO<FichaBibliografica> {
             if (generatedKeys.next()) {
                 fichaBibliografica.setId(generatedKeys.getInt(1));
             } else {
-                throw new SQLException("La inserción de la ficha falló, no se obtuvo ID generado");
+                throw new SQLException("La insercion de la ficha fallo, no se obtuvo ID generado");
             }
         }
     }

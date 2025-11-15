@@ -14,7 +14,7 @@ public class TransactionManager implements AutoCloseable {
     /** JAVADOC AQUÍ */
     public TransactionManager(Connection conn) throws SQLException {
         if (conn == null) {
-            throw new IllegalArgumentException("La conexión no puede ser null");
+            throw new IllegalArgumentException("La conexion no puede ser null");
         }
         this.conn = conn;
         this.transactionActive = false;
@@ -28,10 +28,10 @@ public class TransactionManager implements AutoCloseable {
     /** JAVADOC AQUÍ */
     public void startTransaction() throws SQLException {
         if (conn == null) {
-            throw new SQLException("No se puede iniciar la transacción: conexión no disponible");
+            throw new SQLException("No se puede iniciar la transaccion: conexion no disponible");
         }
         if (conn.isClosed()) {
-            throw new SQLException("No se puede iniciar la transacción: conexión cerrada");
+            throw new SQLException("No se puede iniciar la transaccion: conexion cerrada");
         }
         conn.setAutoCommit(false);
         transactionActive = true;
@@ -40,10 +40,10 @@ public class TransactionManager implements AutoCloseable {
     /** JAVADOC AQUÍ */
     public void commit() throws SQLException {
         if (conn == null) {
-            throw new SQLException("Error al hacer commit: no hay conexión establecida");
+            throw new SQLException("Error al hacer commit: no hay conexion establecida");
         }
         if (!transactionActive) {
-            throw new SQLException("No hay una transacción activa para hacer commit");
+            throw new SQLException("No hay una transaccion activa para hacer commit");
         }
         conn.commit();
         transactionActive = false;
