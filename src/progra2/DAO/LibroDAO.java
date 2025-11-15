@@ -82,9 +82,50 @@ public class LibroDAO implements GenericDAO<Libro> {
             "WHERE l.eliminado = FALSE";
     
     /** JAVADOC AQUÍ */
+    
+    //Metodos cn conexion propia
+    
     @Override
-    public void insertar(Libro libro) throws SQLException {
-        try (Connection conn = DatabaseConnection.getConnection();
+    public void insertar(Libro libro) throws SQLException{
+        try(Connection conn = DatabaseConnection.getConnection()){
+            insertar(libro, conn);
+        }
+    }
+    
+    @Override
+    public void actualizar(Libro libro) throws SQLException{
+        try(Connection conn = DatabaseConnection.getConnection()){
+            actualizar (libro , conn);
+        }
+    }
+    
+    @Override
+    public void eliminar(int id) throws SQLException{
+        try(Connection conn = DatabaseConnection.getConnection()){
+            eliminar(id, conn);
+        }
+    }
+    
+    
+    @Override
+    public Libro getById(int id) throws SQLException{
+        try(Connection conn = DatabaseConnection.getConnection()){
+            return getById(id,conn);
+        }
+    }
+    
+    @Override
+    public List<Libro> getAll() throws SQLException{
+        try(Connection conn = DatabaseConnection.getConnection()){
+            return getAll(conn);
+        }
+    }
+    
+    // Metodos con conexion Externa (Para transacciones)
+    
+    //inserta un libro usando conexion externa (para transacciones)
+    public void insertar(Libro libro, Connection conn) throws SQLException {
+        try (
              PreparedStatement stmt = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
             
             setLibroParameters(stmt, libro);
@@ -94,9 +135,9 @@ public class LibroDAO implements GenericDAO<Libro> {
     }
     
     /** JAVADOC AQUÍ */
-    @Override
-    public void actualizar(Libro libro) throws SQLException {
-        try (Connection conn = DatabaseConnection.getConnection();
+    //actualiza libro usando una conexion externa(para transsaciones)
+    public void actualizar(Libro libro, Connection conn) throws SQLException {
+        try (
              PreparedStatement stmt = conn.prepareStatement(UPDATE_SQL)) {
             
             setLibroParameters(stmt, libro);
@@ -110,9 +151,9 @@ public class LibroDAO implements GenericDAO<Libro> {
     }
     
     /** JAVADOC AQUÍ */
-    @Override
-    public void eliminar(int id) throws SQLException {
-        try (Connection conn = DatabaseConnection.getConnection();
+    //elimina un libro usando una conexion externa(para transsaciones)
+    public void eliminar(int id, Connection conn) throws SQLException {
+        try (
              PreparedStatement stmt = conn.prepareStatement(DELETE_SQL)) {
             
             stmt.setInt(1, id);
@@ -124,10 +165,13 @@ public class LibroDAO implements GenericDAO<Libro> {
         }
     }
     
+    
+    //Metodos de busqueda
+    
     /** JAVADOC AQUÍ */
-    @Override
-    public Libro getById(int id) throws SQLException {
-        try (Connection conn = DatabaseConnection.getConnection();
+   //obtiene un libro por ID usando una conexion externa
+    public Libro getById(int id, Connection conn) throws SQLException {
+        try (
              PreparedStatement stmt = conn.prepareStatement(SELECT_BY_ID_SQL)) {
             
             stmt.setInt(1, id);
@@ -232,11 +276,11 @@ public class LibroDAO implements GenericDAO<Libro> {
     }
     
     /** JAVADOC AQUÍ */
-    @Override
-    public List<Libro> getAll() throws SQLException {
+    
+    public List<Libro> getAll(Connection conn) throws SQLException {
         List<Libro> libros = new ArrayList<>();
           
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(SELECT_ALL_SQL)) {
             
