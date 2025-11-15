@@ -17,7 +17,12 @@ public class LibroService implements GenericService<Libro> {
         this.libroDAO = libroDAO;
         this.fichaBibliograficaService = null;
     }
-
+    
+    /**
+     * Constructor que recibe las dependencias necesarias.
+     * @param libroDAO DAO para operaciones de persistencia
+     * @param fichaBibliograficaService servicio para validar fichas bibliográficas
+     */
     public LibroService(LibroDAO libroDAO, FichaBibliograficaService fichaBibliograficaService) {
         if (libroDAO == null) {
             throw new IllegalArgumentException("LibroDAO no puede ser null");
@@ -44,22 +49,15 @@ public class LibroService implements GenericService<Libro> {
     @Override
     public void eliminar(int id) throws Exception {
         if (id <= 0) {
-            throw new IllegalArgumentException("El ID debe ser un número positivo mayor a cero");
+            throw new IllegalArgumentException("El ID debe ser un numero positivo mayor a cero");
         }
-        
-        // Verificar que el libro existe antes de intentar eliminarlo
-        Libro libroExistente = libroDAO.getById(id);
-        if (libroExistente == null) {
-            throw new IllegalArgumentException("No existe un libro con ID: " + id);
-        }
-        
         libroDAO.eliminar(id);
     }
 
     @Override
     public Libro getById(int id) throws Exception {
         if (id <= 0) {
-            throw new IllegalArgumentException("El ID debe ser un número positivo mayor a cero");
+            throw new IllegalArgumentException("El ID debe ser un numero positivo mayor a cero");
         }
         return libroDAO.getById(id);
     }
@@ -71,37 +69,36 @@ public class LibroService implements GenericService<Libro> {
 
     public List<Libro> buscarPorTitulo(String titulo) throws Exception {
         if (titulo == null || titulo.trim().isEmpty()) {
-            throw new IllegalArgumentException("El título de búsqueda no puede estar vacío");
+            throw new IllegalArgumentException("El titulo de busqueda no puede estar vacio");
         }
         return libroDAO.getByTitulo(titulo);
     }
 
     public List<Libro> buscarPorAutor(String autor) throws Exception {
         if (autor == null || autor.trim().isEmpty()) {
-            throw new IllegalArgumentException("El autor de búsqueda no puede estar vacío");
+            throw new IllegalArgumentException("El autor de busqueda no puede estar vacio");
         }
         return libroDAO.getByAutor(autor);
     }
 
     public List<Libro> buscarPorEditorial(String editorial) throws Exception {
         if (editorial == null || editorial.trim().isEmpty()) {
-            throw new IllegalArgumentException("La editorial de búsqueda no puede estar vacía");
+            throw new IllegalArgumentException("La editorial de busqueda no puede estar vacia");
         }
         return libroDAO.getByEditorial(editorial);
     }
 
     public List<Libro> buscarPorAnioPublicacion(int anio) throws Exception {
-        if (anio < 1000 || anio > java.time.Year.now().getValue()) {
-            throw new IllegalArgumentException(
-                "El año debe estar entre 1000 y " + java.time.Year.now().getValue()
-            );
+        int anioActual = java.time.Year.now().getValue();
+        if (anio < 1000 || anio > anioActual) {
+            throw new IllegalArgumentException("El anio debe estar entre 1000 y " + anioActual);
         }
         return libroDAO.getByAnioEdicion(anio);
     }
-
+    
     public List<Libro> buscarPorIdioma(String idioma) throws Exception {
         if (idioma == null || idioma.trim().isEmpty()) {
-            throw new IllegalArgumentException("El idioma de búsqueda no puede estar vacío");
+            throw new IllegalArgumentException("El idioma de busqueda no puede estar vacio");
         }
         return libroDAO.getByIdioma(idioma);
     }
@@ -119,10 +116,10 @@ public class LibroService implements GenericService<Libro> {
         
         // Validar título (obligatorio)
         if (libro.getTitulo() == null || libro.getTitulo().trim().isEmpty()) {
-            throw new IllegalArgumentException("El título del libro es obligatorio");
+            throw new IllegalArgumentException("El titulo del libro es obligatorio");
         }
         if (libro.getTitulo().length() > 150) {
-            throw new IllegalArgumentException("El título no puede exceder 150 caracteres");
+            throw new IllegalArgumentException("El titulo no puede exceder 150 caracteres");
         }
         
         // Validar autor (obligatorio)
@@ -142,11 +139,11 @@ public class LibroService implements GenericService<Libro> {
         if (libro.getAnioEdicion() != null) {
             int anioActual = java.time.Year.now().getValue();
             if (libro.getAnioEdicion() < 1000) {
-                throw new IllegalArgumentException("El año de edición debe ser mayor o igual a 1000");
+                throw new IllegalArgumentException("El anio de edicion debe ser mayor o igual a 1000");
             }
             if (libro.getAnioEdicion() > anioActual) {
                 throw new IllegalArgumentException(
-                    "El año de edición no puede ser posterior al año actual (" + anioActual + ")"
+                    "El anio de edicion no puede ser posterior al anio actual (" + anioActual + ")"
                 );
             }
         }
@@ -155,7 +152,7 @@ public class LibroService implements GenericService<Libro> {
         if (libro.getFichaBibliografica() != null) {
             if (libro.getFichaBibliografica().getId() <= 0) {
                 throw new IllegalArgumentException(
-                    "La ficha bibliográfica debe estar guardada en la base de datos antes de asociarla"
+                    "La ficha bibliografica debe estar guardada en la base de datos antes de asociarla"
                 );
             }
             
@@ -165,7 +162,7 @@ public class LibroService implements GenericService<Libro> {
             );
             if (fichaExistente == null) {
                 throw new IllegalArgumentException(
-                    "No existe una ficha bibliográfica con ID: " + libro.getFichaBibliografica().getId()
+                    "No existe una ficha bibliografica con ID: " + libro.getFichaBibliografica().getId()
                 );
             }
         }
@@ -181,7 +178,7 @@ public class LibroService implements GenericService<Libro> {
         
         // Validar que el ID sea válido
         if (libro.getId() <= 0) {
-            throw new IllegalArgumentException("El ID del libro debe ser un número positivo mayor a cero");
+            throw new IllegalArgumentException("El ID del libro debe ser un numero positivo mayor a cero");
         }
         
         // Verificar que el libro existe

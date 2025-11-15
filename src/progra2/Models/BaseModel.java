@@ -2,18 +2,22 @@ package progra2.Models;
 
 public abstract class BaseModel {
     
-    /** JAVADOC AQUÍ */
+    /** Identificador único de la entidad en la base de datos. */
     private int id;
-    /** JAVADOC AQUÍ */
+    /** Indica si la entidad fue eliminada lógicamente (soft delete). */
     private boolean eliminado;
     
-    /** JAVADOC AQUÍ */
+    /**
+     * Constructor con parámetros para inicializar una entidad con ID.
+     * @param id identificador de la entidad
+     * @param eliminado estado de eliminación lógica
+     */
     protected BaseModel(int id, boolean eliminado) {
         this.id = id;
         this.eliminado = eliminado;
     }
     
-    /** JAVADOC AQUÍ */
+    /** Constructor sin parámetros que inicializa eliminado en false. */
     protected BaseModel() {
         this.eliminado = false;
     }

@@ -2,15 +2,23 @@ package progra2.Models;
 
 public class Libro extends BaseModel {
     
-    /** JAVADOC AQUÍ */
+    /** Atributos del modelo de Libro */
     private String titulo;
     private String autor;
     private String editorial;
-    private Integer anioEdicion;    // Integer en lugar de int para permitir null.
+    private Integer anioEdicion;
     private FichaBibliografica fichaBibliografica;
     
-    /** JAVADOC AQUÍ */
-    public Libro(int id, String titulo, String autor, String editorial, int anioEdicion, FichaBibliografica fichaBibliografica) {
+    /** 
+     * Constructor completo para crear un libro con todos sus datos.
+     * @param id identificador del libro
+     * @param titulo titulo del libro (obligatorio)
+     * @param autor autor del libro (obligatorio)
+     * @param editorial editorial del libro (opcional)
+     * @param anioEdicion año de edición (opcional, puede ser null)
+     * @param fichaBibliografica ficha bibliográfica asociada (opcional)
+     */
+    public Libro(int id, String titulo, String autor, String editorial, Integer anioEdicion, FichaBibliografica fichaBibliografica) {
         super(id, false);
         this.titulo = titulo;
         this.autor = autor;
@@ -19,62 +27,97 @@ public class Libro extends BaseModel {
         this.fichaBibliografica = fichaBibliografica;
     }
     
-    /** JAVADOC AQUÍ */
+    /** Constructor vacío para instanciación sin datos. */
     public Libro() {
         super();
     }
     
-    /** JAVADOC AQUÍ */
+    /** Obtiene el título del libro.
+     * @return  Título del libro
+     */
     public String getTitulo() {
         return titulo;
     }
     
-    /** JAVADOC AQUÍ */
-    public String getAutor() {
-        return autor;
-    }
-    
-    /** JAVADOC AQUÍ */
-    public String getEditorial() {
-        return editorial;
-    }
-    
-    /** JAVADOC AQUÍ */
-    public Integer getAnioEdicion() {  //cambiado a Integer
-        return anioEdicion;
-    }
-    
-    /** JAVADOC AQUÍ */
-    public FichaBibliografica getFichaBibliografica() {
-        return fichaBibliografica;
-    }
-    
-    /** JAVADOC AQUÍ */
+    /**
+     * Establece el titulo al libro.
+     * 
+     * @param titulo Nuevo título del libro
+     */
     public void setTitulo(String titulo) {
         this.titulo = titulo;
     }
     
-    /** JAVADOC AQUÍ */
+    /** Obtiene el autor del libro.
+     * @return  Autor del libro
+     */
+    public String getAutor() {
+        return autor;
+    }
+    
+    /**
+     * Establece el autor al libro.
+     * 
+     * @param autor Nuevo autor del libro
+     */
     public void setAutor(String autor) {
         this.autor = autor;
     }
     
-    /** JAVADOC AQUÍ */
+    /** Obtiene el editorial del libro.
+     * @return  Editorial del libro
+     */
+    public String getEditorial() {
+        return editorial;
+    }
+    
+    /**
+     * Establece el editorial al libro.
+     * 
+     * @param editorial Nuevo editorial del libro
+     */
     public void setEditorial(String editorial) {
         this.editorial = editorial;
     }
     
-    /** JAVADOC AQUÍ */
-    public void setAnioEdicion(Integer anioEdicion) {    //Cambiado a Integer
+    /** Obtiene el año de edición del libro.
+     * @return  Año de edición del libro
+     */
+    public Integer getAnioEdicion() {
+        return anioEdicion;
+    }
+    
+    /**
+     * Establece el año de edición al libro.
+     * 
+     * @param anioEdicion Nuevo autor del libro
+     */
+    public void setAnioEdicion(Integer anioEdicion) {
         this.anioEdicion = anioEdicion;
     }
     
-    /** JAVADOC AQUÍ */
+    /** Obtiene la ficha bibliográfica de un libro.
+     * @return  Ficha bibliografica de un libro
+     */
+    public FichaBibliografica getFichaBibliografica() {
+        return fichaBibliografica;
+    }
+    
+    /**
+     * Establece la ficha bibliográfica al libro.
+     * 
+     * @param fichaBibliografica Nueva ficha bibliográfica del libro
+     */
     public void setFichaBibliografica(FichaBibliografica fichaBibliografica) {
         this.fichaBibliografica = fichaBibliografica;
     }
     
-    /** JAVADOC AQUÍ */
+    /**
+     * Representación en texto del libro.
+     * Útil para debugging y logging.
+     *
+     * @return String con todos los campos del libro
+     */
     @Override
     public String toString() {
         return "Libro{" +

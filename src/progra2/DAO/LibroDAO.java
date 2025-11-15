@@ -81,23 +81,11 @@ public class LibroDAO implements GenericDAO<Libro> {
             "LEFT JOIN ficha_bibliografica f ON l.ficha_bibliografica_id = f.id " +
             "WHERE l.eliminado = FALSE";
     
-    
     /** JAVADOC AQUÍ */
     @Override
     public void insertar(Libro libro) throws SQLException {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
-            
-            setLibroParameters(stmt, libro);
-            stmt.executeUpdate();
-            setGeneratedId(stmt, libro);
-        }
-    }
-    
-    /** JAVADOC AQUÍ */
-    @Override
-    public void insertTx(Libro libro, Connection conn) throws SQLException {
-        try (PreparedStatement stmt = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
             
             setLibroParameters(stmt, libro);
             stmt.executeUpdate();
@@ -263,7 +251,7 @@ public class LibroDAO implements GenericDAO<Libro> {
     // ========================== Métodos Auxiliares ==========================
     
     /** Configura los parámetros del PreparedStatement con los datos del libro. */
-     private void setLibroParameters(PreparedStatement stmt, Libro libro) throws SQLException {
+    private void setLibroParameters(PreparedStatement stmt, Libro libro) throws SQLException {
         stmt.setString(1, libro.getTitulo());
         stmt.setString(2, libro.getAutor());
         stmt.setString(3, libro.getEditorial());
@@ -277,7 +265,7 @@ public class LibroDAO implements GenericDAO<Libro> {
         
         // Manejar ficha_bibliografica_id nullable
         if (libro.getFichaBibliografica() != null && libro.getFichaBibliografica().getId() > 0) {
-            stmt.setInt(5, libro.getFichaBibliografica().getId());  // CORREGIDO: era setNull
+            stmt.setInt(5, libro.getFichaBibliografica().getId());
         } else {
             stmt.setNull(5, java.sql.Types.BIGINT);
         }
@@ -310,11 +298,12 @@ public class LibroDAO implements GenericDAO<Libro> {
                 rs.getBoolean("ficha_eliminado")
             );
         }
-       
+        
         // Manejar anio_edicion nullable
-        Integer anioEdicion = rs.getInt("anio_edicion");
-        if (rs.wasNull()) {
-            anioEdicion = null;
+        Integer anioEdicion = null;
+        int anioValue = rs.getInt("anio_edicion");
+        if (!rs.wasNull()) {
+            anioEdicion = anioValue;
         }
         
         return new Libro(

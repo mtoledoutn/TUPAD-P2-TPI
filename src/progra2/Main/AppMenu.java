@@ -36,16 +36,6 @@ public class AppMenu {
     }
     
     /**
-     * Método main alternativo para ejecutar la aplicación desde esta clase.
-     * 
-     * @param args argumentos de línea de comandos (no utilizados)
-     */
-    public static void main(String[] args) {
-        AppMenu app = new AppMenu();
-        app.run();
-    }
-    
-    /**
      * Bucle principal de la aplicación que muestra el menú y procesa opciones.
      * Gestiona errores de entrada inválida y mantiene la aplicación en ejecución
      * hasta que el usuario seleccione salir.
