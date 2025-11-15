@@ -3,15 +3,12 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/Documents/NetBeansProjects/TUPAD-P2-TPI/src/progra2/Config/DatabaseConnection.java</file>
-            <file>file:/D:/Documents/NetBeansProjects/TUPAD-P2-TPI/sql/create_database.sql</file>
-            <file>file:/D:/Documents/NetBeansProjects/TUPAD-P2-TPI/src/progra2/Main/Main.java</file>
-            <file>file:/D:/Documents/NetBeansProjects/TUPAD-P2-TPI/src/progra2/Main/AppMenu.java</file>
-            <file>file:/D:/Documents/NetBeansProjects/TUPAD-P2-TPI/src/progra2/Service/LibroService.java</file>
-            <file>file:/D:/Documents/NetBeansProjects/TUPAD-P2-TPI/src/progra2/DAO/FichaBibliograficaDAO.java</file>
-            <file>file:/D:/Documents/NetBeansProjects/TUPAD-P2-TPI/src/progra2/Main/MenuDisplay.java</file>
-            <file>file:/D:/Documents/NetBeansProjects/TUPAD-P2-TPI/src/progra2/Main/MenuHandler.java</file>
-            <file>file:/D:/Documents/NetBeansProjects/TUPAD-P2-TPI/src/progra2/Models/FichaBibliografica.java</file>
+            <file>file:/C:/Users/romer/Desktop/TUPAD-P2-TPI/src/progra2/DAO/LibroDAO.java</file>
+            <file>file:/C:/Users/romer/Desktop/TUPAD-P2-TPI/src/progra2/Main/AppMenu.java</file>
+            <file>file:/C:/Users/romer/Desktop/TUPAD-P2-TPI/src/progra2/Main/MenuDisplay.java</file>
+            <file>file:/C:/Users/romer/Desktop/TUPAD-P2-TPI/src/progra2/Main/MenuHandler.java</file>
+            <file>file:/C:/Users/romer/Desktop/TUPAD-P2-TPI/src/progra2/Main/TestConexion.java</file>
+            <file>file:/C:/Users/romer/Desktop/TUPAD-P2-TPI/src/progra2/Service/FichaBibliograficaService.java</file>
         </group>
     </open-files>
 </project-private>
