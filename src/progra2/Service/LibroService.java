@@ -3,6 +3,7 @@ package progra2.Service;
 import java.sql.Connection;
 import java.util.List;
 import progra2.Config.DatabaseConnection;
+import progra2.Config.TransactionManager;
 import progra2.DAO.LibroDAO;
 import progra2.Models.FichaBibliografica;
 import progra2.Models.Libro;
@@ -12,9 +13,13 @@ import progra2.Models.Libro;
  * Encapsula validaciones de reglas de negocio antes de delegar al DAO.
  */
 public class LibroService implements GenericService<Libro> {
+    
+    /** JAVADOC AQUÍ */
     private final LibroDAO libroDAO;
+    /** JAVADOC AQUÍ */
     private final FichaBibliograficaService fichaBibliograficaService;
-
+    
+    /** JAVADOC AQUÍ */
     public LibroService(LibroDAO libroDAO) {
         this.libroDAO = libroDAO;
         this.fichaBibliograficaService = null;
@@ -36,22 +41,25 @@ public class LibroService implements GenericService<Libro> {
         this.fichaBibliograficaService = fichaBibliograficaService;
     }
     
-    // ======================= Metodos sin transsacion =======================
+    // ======================= Métodos sin transsacion =======================
     
+    /** JAVADOC AQUÍ */
     @Override
     public void insertar(Libro libro) throws Exception {
         validarLibroParaInsercion(libro);
         normalizarLibro(libro);
         libroDAO.insertar(libro);
     }
-
+    
+    /** JAVADOC AQUÍ */
     @Override
     public void actualizar(Libro libro) throws Exception {
         validarLibroParaActualizacion(libro);
         normalizarLibro(libro);
         libroDAO.actualizar(libro);
     }
-
+    
+    /** JAVADOC AQUÍ */
     @Override
     public void eliminar(int id) throws Exception {
         if (id <= 0) {
@@ -59,7 +67,8 @@ public class LibroService implements GenericService<Libro> {
         }
         libroDAO.eliminar(id);
     }
-
+    
+    /** JAVADOC AQUÍ */
     @Override
     public Libro getById(int id) throws Exception {
         if (id <= 0) {
@@ -67,36 +76,41 @@ public class LibroService implements GenericService<Libro> {
         }
         return libroDAO.getById(id);
     }
-
+    
+    /** JAVADOC AQUÍ */
     @Override
     public List<Libro> getAll() throws Exception {
         return libroDAO.getAll();
     }
-
     
-    // ========================= Metodos de busqueda =========================
     
+    // ========================= Métodos de busqueda =========================
+    
+    /** JAVADOC AQUÍ */
     public List<Libro> buscarPorTitulo(String titulo) throws Exception {
         if (titulo == null || titulo.trim().isEmpty()) {
             throw new IllegalArgumentException("El titulo de busqueda no puede estar vacio");
         }
         return libroDAO.getByTitulo(titulo);
     }
-
+    
+    /** JAVADOC AQUÍ */
     public List<Libro> buscarPorAutor(String autor) throws Exception {
         if (autor == null || autor.trim().isEmpty()) {
             throw new IllegalArgumentException("El autor de busqueda no puede estar vacio");
         }
         return libroDAO.getByAutor(autor);
     }
-
+    
+    /** JAVADOC AQUÍ */
     public List<Libro> buscarPorEditorial(String editorial) throws Exception {
         if (editorial == null || editorial.trim().isEmpty()) {
             throw new IllegalArgumentException("La editorial de busqueda no puede estar vacia");
         }
         return libroDAO.getByEditorial(editorial);
     }
-
+    
+    /** JAVADOC AQUÍ */
     public List<Libro> buscarPorAnioPublicacion(int anio) throws Exception {
         int anioActual = java.time.Year.now().getValue();
         if (anio < 1000 || anio > anioActual) {
@@ -105,6 +119,7 @@ public class LibroService implements GenericService<Libro> {
         return libroDAO.getByAnioEdicion(anio);
     }
     
+    /** JAVADOC AQUÍ */
     public List<Libro> buscarPorIdioma(String idioma) throws Exception {
         if (idioma == null || idioma.trim().isEmpty()) {
             throw new IllegalArgumentException("El idioma de busqueda no puede estar vacio");
@@ -113,10 +128,11 @@ public class LibroService implements GenericService<Libro> {
     }
     
     
-    // ====================== Metodos con Transacciones ======================
+    // ====================== Métodos con Transacciones ======================
     
     /**
      * Inserta un libro con su ficha bibliográfica en una TRANSACCIÓN ATÓMICA.
+     * Usa TransactionManager para manejar commit/rollback automáticamente.
      * Si algo falla, se hace rollback de TODO.
      * 
      * @param libro el libro a insertar
@@ -124,14 +140,12 @@ public class LibroService implements GenericService<Libro> {
      * @throws Exception si hay error en validación o inserción
      */
     public void insertarLibroConFicha(Libro libro, FichaBibliografica ficha) throws Exception {
-        Connection conn = null;
-        boolean originalAutoCommit = true;
-        
-        try {
-            // 1. Obtener conexión y configurar transacción
-            conn = DatabaseConnection.getConnection();
-            originalAutoCommit = conn.getAutoCommit();
-            conn.setAutoCommit(false);
+        // Try-with-resources: TransactionManager cierra automáticamente
+        try (TransactionManager tm = new TransactionManager(DatabaseConnection.getConnection())) {
+            
+            // 1. Iniciar transacción
+            tm.startTransaction();
+            Connection conn = tm.getConnection();
             
             // 2. Si hay ficha, insertarla primero
             if (ficha != null) {
@@ -146,87 +160,52 @@ public class LibroService implements GenericService<Libro> {
             libroDAO.insertar(libro, conn);
             System.out.println("Libro creado con ID: " + libro.getId());
             
-            // 4. Si todo salió bien, confirmar transacción
-            conn.commit();
+            // 4. Confirmar transacción
+            tm.commit();
             System.out.println("Transaccion completada exitosamente");
             
         } catch (Exception e) {
-            // 5. Si algo falló, revertir TODO
-            if (conn != null) {
-                try {
-                    conn.rollback();
-                    System.err.println("Error: Se revirtieron todos los cambios (rollback)");
-                } catch (Exception rollbackEx) {
-                    System.err.println("Error adicional al hacer rollback: " + rollbackEx.getMessage());
-                }
-            }
+            // 5. El rollback lo hace automáticamente TransactionManager en close()
+            System.err.println("Error: Se revirtieron todos los cambios (rollback)");
             throw new Exception("Error al crear libro con ficha: " + e.getMessage(), e);
-            
-        } finally {
-            // 6. Restaurar autoCommit y cerrar conexión
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(originalAutoCommit);
-                    conn.close();
-                } catch (Exception e) {
-                    System.err.println("Error al cerrar conexion: " + e.getMessage());
-                }
-            }
         }
     }
     
     /**
      * Actualiza un libro y su ficha bibliográfica en una TRANSACCIÓN ATÓMICA.
+     * Usa TransactionManager para manejar commit/rollback automáticamente.
      * 
      * @param libro el libro con los datos actualizados
      * @param actualizarFicha true si también se debe actualizar la ficha
      * @throws Exception si hay error
      */
     public void actualizarLibroConFicha(Libro libro, boolean actualizarFicha) throws Exception {
-        Connection conn = null;
-        boolean originalAutoCommit = true;
-        
-        try {
-            conn = DatabaseConnection.getConnection();
-            originalAutoCommit = conn.getAutoCommit();
-            conn.setAutoCommit(false);
+        try (TransactionManager tm = new TransactionManager(DatabaseConnection.getConnection())) {
             
-            // 1. Actualizar ficha si es necesario
+            // 1. Iniciar transacción
+            tm.startTransaction();
+            Connection conn = tm.getConnection();
+            
+            // 2. Actualizar ficha si es necesario
             if (actualizarFicha && libro.getFichaBibliografica() != null) {
                 fichaBibliograficaService.actualizar(libro.getFichaBibliografica(), conn);
                 System.out.println("Ficha actualizada");
             }
             
-            // 2. Actualizar libro
+            // 3. Actualizar libro
             validarLibroParaActualizacion(libro);
             normalizarLibro(libro);
             libroDAO.actualizar(libro, conn);
             System.out.println("Libro actualizado");
             
-            // 3. Confirmar
-            conn.commit();
+            // 4. Confirmar
+            tm.commit();
             System.out.println("Transaccion completada exitosamente");
             
         } catch (Exception e) {
-            if (conn != null) {
-                try {
-                    conn.rollback();
-                    System.err.println("Error: Se revirtieron todos los cambios (rollback)");
-                } catch (Exception rollbackEx) {
-                    System.err.println("Error adicional al hacer rollback: " + rollbackEx.getMessage());
-                }
-            }
+            // El rollback lo hace automáticamente TransactionManager en close()
+            System.err.println("Error: Se revirtieron todos los cambios (rollback)");
             throw new Exception("Error al actualizar libro: " + e.getMessage(), e);
-            
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(originalAutoCommit);
-                    conn.close();
-                } catch (Exception e) {
-                    System.err.println("Error al cerrar conexion: " + e.getMessage());
-                }
-            }
         }
     }
     
