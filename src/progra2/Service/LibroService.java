@@ -36,17 +36,19 @@ public class LibroService implements GenericService<Libro> {
         this.fichaBibliograficaService = fichaBibliograficaService;
     }
     
-    //Metodos sin transsacion
+    // ======================= Metodos sin transsacion =======================
     
     @Override
     public void insertar(Libro libro) throws Exception {
         validarLibroParaInsercion(libro);
+        normalizarLibro(libro);
         libroDAO.insertar(libro);
     }
 
     @Override
     public void actualizar(Libro libro) throws Exception {
         validarLibroParaActualizacion(libro);
+        normalizarLibro(libro);
         libroDAO.actualizar(libro);
     }
 
@@ -72,7 +74,7 @@ public class LibroService implements GenericService<Libro> {
     }
 
     
-    // Metodos de busqueda
+    // ========================= Metodos de busqueda =========================
     
     public List<Libro> buscarPorTitulo(String titulo) throws Exception {
         if (titulo == null || titulo.trim().isEmpty()) {
@@ -111,7 +113,7 @@ public class LibroService implements GenericService<Libro> {
     }
     
     
-    // =================== Metodos con Transacciones
+    // ====================== Metodos con Transacciones ======================
     
     /**
      * Inserta un libro con su ficha bibliográfica en una TRANSACCIÓN ATÓMICA.
@@ -135,26 +137,27 @@ public class LibroService implements GenericService<Libro> {
             if (ficha != null) {
                 fichaBibliograficaService.insertar(ficha, conn);
                 libro.setFichaBibliografica(ficha);
-                System.out.println("→ Ficha creada con ID: " + ficha.getId());
+                System.out.println("Ficha creada con ID: " + ficha.getId());
             }
             
             // 3. Validar e insertar el libro
             validarLibroParaInsercion(libro);
+            normalizarLibro(libro);
             libroDAO.insertar(libro, conn);
-            System.out.println("→ Libro creado con ID: " + libro.getId());
+            System.out.println("Libro creado con ID: " + libro.getId());
             
             // 4. Si todo salió bien, confirmar transacción
             conn.commit();
-            System.out.println("✓ Transaccion completada exitosamente");
+            System.out.println("Transaccion completada exitosamente");
             
         } catch (Exception e) {
             // 5. Si algo falló, revertir TODO
             if (conn != null) {
                 try {
                     conn.rollback();
-                    System.err.println("✗ Error: Se revirtieron todos los cambios (rollback)");
+                    System.err.println("Error: Se revirtieron todos los cambios (rollback)");
                 } catch (Exception rollbackEx) {
-                    System.err.println("✗ Error adicional al hacer rollback: " + rollbackEx.getMessage());
+                    System.err.println("Error adicional al hacer rollback: " + rollbackEx.getMessage());
                 }
             }
             throw new Exception("Error al crear libro con ficha: " + e.getMessage(), e);
@@ -191,25 +194,26 @@ public class LibroService implements GenericService<Libro> {
             // 1. Actualizar ficha si es necesario
             if (actualizarFicha && libro.getFichaBibliografica() != null) {
                 fichaBibliograficaService.actualizar(libro.getFichaBibliografica(), conn);
-                System.out.println("→ Ficha actualizada");
+                System.out.println("Ficha actualizada");
             }
             
             // 2. Actualizar libro
             validarLibroParaActualizacion(libro);
+            normalizarLibro(libro);
             libroDAO.actualizar(libro, conn);
-            System.out.println("→ Libro actualizado");
+            System.out.println("Libro actualizado");
             
             // 3. Confirmar
             conn.commit();
-            System.out.println("✓ Transaccion completada exitosamente");
+            System.out.println("Transaccion completada exitosamente");
             
         } catch (Exception e) {
             if (conn != null) {
                 try {
                     conn.rollback();
-                    System.err.println("✗ Error: Se revirtieron todos los cambios (rollback)");
+                    System.err.println("Error: Se revirtieron todos los cambios (rollback)");
                 } catch (Exception rollbackEx) {
-                    System.err.println("✗ Error adicional al hacer rollback: " + rollbackEx.getMessage());
+                    System.err.println("Error adicional al hacer rollback: " + rollbackEx.getMessage());
                 }
             }
             throw new Exception("Error al actualizar libro: " + e.getMessage(), e);
@@ -228,9 +232,20 @@ public class LibroService implements GenericService<Libro> {
     
     // ==================== Métodos de Validación Privados ====================
     
-    /**
-     * Valida todas las reglas de negocio para insertar un libro nuevo.
-     */
+    /** Normaliza los campos de texto del libro convirtiéndolos a mayúsculas. */
+    private void normalizarLibro(Libro libro) {
+        if (libro.getTitulo() != null) {
+            libro.setTitulo(libro.getTitulo().trim().toUpperCase());
+        }
+        if (libro.getAutor() != null) {
+            libro.setAutor(libro.getAutor().trim().toUpperCase());
+        }
+        if (libro.getEditorial() != null) {
+            libro.setEditorial(libro.getEditorial().trim().toUpperCase());
+        }
+    }
+    
+    /** Valida todas las reglas de negocio para insertar un libro nuevo. */
     private void validarLibroParaInsercion(Libro libro) throws Exception {
         if (libro == null) {
             throw new IllegalArgumentException("El libro no puede ser null");
@@ -264,35 +279,12 @@ public class LibroService implements GenericService<Libro> {
                 throw new IllegalArgumentException("El anio de edicion debe ser mayor o igual a 1000");
             }
             if (libro.getAnioEdicion() > anioActual) {
-                throw new IllegalArgumentException(
-                    "El anio de edicion no puede ser posterior al anio actual (" + anioActual + ")"
-                );
-            }
-        }
-        
-        // Validar ficha bibliográfica (opcional, pero si existe debe estar en BD)
-        if (libro.getFichaBibliografica() != null) {
-            if (libro.getFichaBibliografica().getId() <= 0) {
-                throw new IllegalArgumentException(
-                    "La ficha bibliografica debe estar guardada en la base de datos antes de asociarla"
-                );
-            }
-            
-            // Verificar que la ficha existe en la BD
-            FichaBibliografica fichaExistente = fichaBibliograficaService.getById(
-                libro.getFichaBibliografica().getId()
-            );
-            if (fichaExistente == null) {
-                throw new IllegalArgumentException(
-                    "No existe una ficha bibliografica con ID: " + libro.getFichaBibliografica().getId()
-                );
+                throw new IllegalArgumentException("El anio de edicion no puede ser posterior al anio actual (" + anioActual + ")");
             }
         }
     }
     
-    /**
-     * Valida todas las reglas de negocio para actualizar un libro existente.
-     */
+    /** Valida todas las reglas de negocio para actualizar un libro existente. */
     private void validarLibroParaActualizacion(Libro libro) throws Exception {
         if (libro == null) {
             throw new IllegalArgumentException("El libro no puede ser null");

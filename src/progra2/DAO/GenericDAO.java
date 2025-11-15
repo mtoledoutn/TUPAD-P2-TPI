@@ -1,6 +1,5 @@
 package progra2.DAO;
 
-import java.sql.Connection;
 import java.util.List;
 
 /**

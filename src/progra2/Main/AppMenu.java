@@ -102,8 +102,8 @@ public class AppMenu {
     }
     
     /** Factoría de servicio de ficha bibliográfica. */
-    private FichaBibliograficaService createFichaService(){
-        FichaBibliograficaDAO fichaDAO =  new FichaBibliograficaDAO();
+    private FichaBibliograficaService createFichaService() {
+        FichaBibliograficaDAO fichaDAO = new FichaBibliograficaDAO();
         return new FichaBibliograficaService(fichaDAO);
     }
     

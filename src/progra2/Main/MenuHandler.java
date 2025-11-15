@@ -54,7 +54,7 @@ public class MenuHandler {
      * Flujo interactivo para crear un nuevo libro con su ficha bibliográfica.
      * Captura todos los datos necesarios y persiste el libro en la base de datos.
      * La operación es atómica: si falla, no se guarda nada.
-     * Mejorado : Usa transacciones para asegurar atomicidad
+     * Usa transacciones para asegurar atomicidad
      */
     public void crearLibro() {
         try {
@@ -81,14 +81,12 @@ public class MenuHandler {
                 System.out.println("Libro y Ficha creados exitosamente");
                 System.out.println("- Libro ID: "+libro.getId());
                 System.out.println("- Ficha ID: "+ficha.getId());
-            }else{
+            } else {
                 //caso 2: libro sin ficha -> insercion simple(sin transaccion)
                 Libro libro = new Libro(0, titulo, autor, editorial, anioEdicion, null);
                 libroService.insertar(libro);
                 System.out.println("Libro Creado exitosamente con ID: "+ libro.getId());
             }
-            
-          
         } catch (IllegalArgumentException e) {
             System.err.println("Datos invalidos: " + e.getMessage());
         } catch (Exception e) {
@@ -103,7 +101,7 @@ public class MenuHandler {
      */
     private FichaBibliografica crearFicha() {
         String isbn = leerISBN();
-        String clasificacionDewey = leerTexto("Clasificacion Dewey", false);
+        String clasificacionDewey = leerClasificacionDewey();
         String estanteria = leerTexto("Estanteria", false);
         String idioma = leerTexto("Idioma", false);
         
@@ -112,7 +110,7 @@ public class MenuHandler {
     
     /**
      * Flujo interactivo para actualizar un libro existente.
-     * MEJORADO: Usa transacciones cuando se actualiza libro + ficha.
+     * Usa transacciones cuando se actualiza libro + ficha.
      */
     public void actualizarLibro() {
         try {
@@ -187,25 +185,23 @@ public class MenuHandler {
                         if (fichaModificada) {
                             // Actualizar libro + ficha en TRANSACCIÓN
                             libroService.actualizarLibroConFicha(libro, true);
-                            System.out.println("\n✓ Libro y ficha actualizados exitosamente (con transaccion)");
+                            System.out.println("\nLibro y ficha actualizados exitosamente (con transaccion)");
                         } else {
                             // Solo actualizar libro (sin transacción)
                             libroService.actualizar(libro);
-                            System.out.println("\n✓ Libro actualizado exitosamente");
+                            System.out.println("\nLibro actualizado exitosamente");
                         }
                         return;
                     }
                 }
             }
         } catch (Exception e) {
-            System.err.println("\n✗ Error al actualizar libro: " + e.getMessage());
+            System.err.println("\nError al actualizar libro: " + e.getMessage());
             e.printStackTrace();
         }
     }
     
-    /**
-     * Flujo interactivo para actualizar campos individuales de una ficha bibliográfica.
-     */
+    /** Flujo interactivo para actualizar campos individuales de una ficha bibliográfica. */
     private void updateFichaById(FichaBibliografica f) {
         if (f == null) {
             System.out.println("La ficha bibliografica no existe.");
@@ -233,31 +229,29 @@ public class MenuHandler {
             switch (opcion) {
                 case 1 -> {
                     System.out.print("Nuevo ISBN (Enter para mantener actual): ");
-                    String isbn = scanner.nextLine().trim();
+                    String isbn = scanner.nextLine().trim().toUpperCase();
                     if (!isbn.isEmpty()) f.setIsbn(isbn);
                 }
                 case 2 -> {
                     System.out.print("Nueva clasificacion Dewey (Enter para mantener): ");
-                    String dewey = scanner.nextLine().trim();
+                    String dewey = scanner.nextLine().trim().toUpperCase();
                     if (!dewey.isEmpty()) f.setClasificacionDewey(dewey);
                 }
                 case 3 -> {
                     System.out.print("Nueva estanteria (Enter para mantener): ");
-                    String est = scanner.nextLine().trim();
+                    String est = scanner.nextLine().trim().toUpperCase();
                     if (!est.isEmpty()) f.setEstanteria(est);
                 }
                 case 4 -> {
                     System.out.print("Nuevo idioma (Enter para mantener): ");
-                    String idioma = scanner.nextLine().trim();
+                    String idioma = scanner.nextLine().trim().toUpperCase();
                     if (!idioma.isEmpty()) f.setIdioma(idioma);
                 }
             }
         }
     }
     
-    /**
-     * Lista libros según diferentes criterios de búsqueda.
-     */
+    /** Lista libros según diferentes criterios de búsqueda. */
     public void listarLibros() {
         try {
             System.out.println("\n========= LISTAR/BUSCAR LIBROS =========");
@@ -301,14 +295,12 @@ public class MenuHandler {
             mostrarResultadosBusqueda(libros);
             
         } catch (Exception e) {
-            System.err.println("\n✗ Error al listar libros: " + e.getMessage());
+            System.err.println("\nError al listar libros: " + e.getMessage());
             e.printStackTrace();
         }
     }
     
-    /**
-     * Muestra los resultados de una búsqueda de libros.
-     */
+    /** Muestra los resultados de una búsqueda de libros. */
     private void mostrarResultadosBusqueda(List<Libro> libros) {
         if (libros.isEmpty()) {
             System.out.println("\nNo se encontraron libros.");
@@ -334,9 +326,7 @@ public class MenuHandler {
         }
     }
     
-    /**
-     * Muestra los datos actuales de un libro.
-     */
+    /** Muestra los datos actuales de un libro. */
     private void mostrarDatosLibro(Libro libro) {
         System.out.println("\n--- Libro Actual ---");
         System.out.println("ID: " + libro.getId());
@@ -353,9 +343,7 @@ public class MenuHandler {
         }
     }
     
-    /**
-     * Flujo interactivo para eliminar un libro.
-     */
+    /** Flujo interactivo para eliminar un libro. */
     public void eliminarLibro() {
         try {
             System.out.println("\n========= ELIMINAR LIBRO =========");
@@ -374,12 +362,12 @@ public class MenuHandler {
             
             if (confirmacion.equals("S")) {
                 libroService.eliminar(id);
-                System.out.println("\n✓ Libro eliminado exitosamente.");
+                System.out.println("\nLibro eliminado exitosamente.");
             } else {
                 System.out.println("Operacion cancelada.");
             }
         } catch (Exception e) {
-            System.err.println("\n✗ Error al eliminar libro: " + e.getMessage());
+            System.err.println("\nError al eliminar libro: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -440,7 +428,7 @@ public class MenuHandler {
     private String leerTexto(String campo, boolean obligatorio) {
         while (true) {
             System.out.print(campo + (obligatorio ? ": " : " (Enter para omitir): "));
-            String texto = scanner.nextLine().trim();
+            String texto = scanner.nextLine().trim().toUpperCase();
             
             if (!texto.isEmpty()) {
                 return texto;
@@ -454,10 +442,28 @@ public class MenuHandler {
         }
     }
     
+    /** Lee una clasificación dewey válida (opcional). */
+    private String leerClasificacionDewey() {
+        while (true) {
+            System.out.print("Clasificacion Dewey (ej: 863.64 para literatura | Enter para omitir): ");
+            String dewey = scanner.nextLine().trim().toUpperCase();
+
+            if (dewey.isEmpty()) {
+                return null;
+            }
+
+            // Validación básica: números y punto decimal
+            if (dewey.matches("\\d{1,3}(\\.\\d{1,2})?")) {
+                return dewey;
+            }
+            System.out.println("Formato invalido. Ejemplos validos: 005.1, 863.64, 100");
+        }
+    }
+    
     /** Lee un año de edición válido (opcional). */
     private Integer leerAnioEdicion() {
         while (true) {
-            System.out.print("Anio de edicion (Enter para omitir, 0 para cancelar): ");
+            System.out.print("Anio de edicion (Enter para omitir): ");
             String input = scanner.nextLine().trim();
             
             if (input.isEmpty()) {
@@ -466,9 +472,6 @@ public class MenuHandler {
             
             try {
                 int anio = Integer.parseInt(input);
-                if (anio == 0) {
-                    return null;
-                }
                 
                 int anioActual = java.time.Year.now().getValue();
                 if (anio >= 1000 && anio <= anioActual) {
@@ -512,8 +515,8 @@ public class MenuHandler {
     /** Lee un ISBN con validación de formato. */
     private String leerISBN() {
         while (true) {
-            System.out.print("ISBN (Enter para omitir): ");
-            String isbn = scanner.nextLine().trim();
+            System.out.print("ISBN (ej: 978-3-16-148410-0 | Enter para omitir): ");
+            String isbn = scanner.nextLine().trim().toUpperCase();
             
             if (isbn.isEmpty()) {
                 return null;
@@ -524,7 +527,7 @@ public class MenuHandler {
             if (isbnSinGuiones.matches("\\d{10}|\\d{13}")) {
                 return isbn;
             }
-            System.out.println("ISBN invalido. Debe tener 10 o 13 digitos (ej: 978-3-16-148410-0).");
+            System.out.println("ISBN invalido. Debe tener 10 o 13 digitos.");
         }
     }
     

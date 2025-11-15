@@ -55,7 +55,7 @@ public class LibroDAO implements GenericDAO<Libro> {
             "f.id AS ficha_id, f.eliminado AS ficha_eliminado, f.isbn, f.clasificacion_dewey, f.estanteria, f.idioma " +
             "FROM libro l " +
             "LEFT JOIN ficha_bibliografica f ON l.ficha_bibliografica_id = f.id " +
-            "WHERE UPPER(l.editorial) = UPPER(?) AND l.eliminado = FALSE";
+            "WHERE UPPER(l.editorial) LIKE UPPER(?) AND l.eliminado = FALSE";
     
     /** JAVADOC AQUÍ */
     private static final String SELECT_BY_ANIO_SQL =
@@ -81,52 +81,54 @@ public class LibroDAO implements GenericDAO<Libro> {
             "LEFT JOIN ficha_bibliografica f ON l.ficha_bibliografica_id = f.id " +
             "WHERE l.eliminado = FALSE";
     
+    
+    // ===================== Métodos con conexion propia =====================
+    
     /** JAVADOC AQUÍ */
-    
-    //Metodos cn conexion propia
-    
     @Override
-    public void insertar(Libro libro) throws SQLException{
-        try(Connection conn = DatabaseConnection.getConnection()){
+    public void insertar(Libro libro) throws SQLException {
+        try (Connection conn = DatabaseConnection.getConnection()) {
             insertar(libro, conn);
         }
     }
     
+    /** JAVADOC AQUÍ */
     @Override
-    public void actualizar(Libro libro) throws SQLException{
-        try(Connection conn = DatabaseConnection.getConnection()){
-            actualizar (libro , conn);
+    public void actualizar(Libro libro) throws SQLException {
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            actualizar(libro, conn);
         }
     }
     
+    /** JAVADOC AQUÍ */
     @Override
-    public void eliminar(int id) throws SQLException{
-        try(Connection conn = DatabaseConnection.getConnection()){
+    public void eliminar(int id) throws SQLException {
+        try (Connection conn = DatabaseConnection.getConnection()) {
             eliminar(id, conn);
         }
     }
     
-    
+    /** JAVADOC AQUÍ */
     @Override
-    public Libro getById(int id) throws SQLException{
-        try(Connection conn = DatabaseConnection.getConnection()){
-            return getById(id,conn);
+    public Libro getById(int id) throws SQLException {
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            return getById(id, conn);
         }
     }
     
+    /** JAVADOC AQUÍ */
     @Override
-    public List<Libro> getAll() throws SQLException{
-        try(Connection conn = DatabaseConnection.getConnection()){
+    public List<Libro> getAll() throws SQLException {
+        try (Connection conn = DatabaseConnection.getConnection()) {
             return getAll(conn);
         }
     }
     
-    // Metodos con conexion Externa (Para transacciones)
+    // =========== Métodos con conexion Externa (Para transacciones) ===========
     
-    //inserta un libro usando conexion externa (para transacciones)
+    /** JAVADOC AQUÍ */
     public void insertar(Libro libro, Connection conn) throws SQLException {
-        try (
-             PreparedStatement stmt = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement stmt = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
             
             setLibroParameters(stmt, libro);
             stmt.executeUpdate();
@@ -135,10 +137,8 @@ public class LibroDAO implements GenericDAO<Libro> {
     }
     
     /** JAVADOC AQUÍ */
-    //actualiza libro usando una conexion externa(para transsaciones)
     public void actualizar(Libro libro, Connection conn) throws SQLException {
-        try (
-             PreparedStatement stmt = conn.prepareStatement(UPDATE_SQL)) {
+        try (PreparedStatement stmt = conn.prepareStatement(UPDATE_SQL)) {
             
             setLibroParameters(stmt, libro);
             stmt.setInt(6, libro.getId());
@@ -151,10 +151,8 @@ public class LibroDAO implements GenericDAO<Libro> {
     }
     
     /** JAVADOC AQUÍ */
-    //elimina un libro usando una conexion externa(para transsaciones)
     public void eliminar(int id, Connection conn) throws SQLException {
-        try (
-             PreparedStatement stmt = conn.prepareStatement(DELETE_SQL)) {
+        try (PreparedStatement stmt = conn.prepareStatement(DELETE_SQL)) {
             
             stmt.setInt(1, id);
             
@@ -166,13 +164,11 @@ public class LibroDAO implements GenericDAO<Libro> {
     }
     
     
-    //Metodos de busqueda
+    // ========================= Metodos de busqueda =========================
     
     /** JAVADOC AQUÍ */
-   //obtiene un libro por ID usando una conexion externa
     public Libro getById(int id, Connection conn) throws SQLException {
-        try (
-             PreparedStatement stmt = conn.prepareStatement(SELECT_BY_ID_SQL)) {
+        try (PreparedStatement stmt = conn.prepareStatement(SELECT_BY_ID_SQL)) {
             
             stmt.setInt(1, id);
             
@@ -224,12 +220,12 @@ public class LibroDAO implements GenericDAO<Libro> {
     /** JAVADOC AQUÍ */
     public List<Libro> getByEditorial(String editorial) throws SQLException {
         List<Libro> libros = new ArrayList<>();
-        
+
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(SELECT_BY_EDITORIAL_SQL)) {
-            
-            stmt.setString(1, editorial);
-            
+
+            stmt.setString(1, "%" + editorial + "%");
+
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     libros.add(mapResultSetToLibro(rs));
@@ -276,12 +272,10 @@ public class LibroDAO implements GenericDAO<Libro> {
     }
     
     /** JAVADOC AQUÍ */
-    
     public List<Libro> getAll(Connection conn) throws SQLException {
         List<Libro> libros = new ArrayList<>();
           
-        try (
-             Statement stmt = conn.createStatement();
+        try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(SELECT_ALL_SQL)) {
             
             while (rs.next()) {
