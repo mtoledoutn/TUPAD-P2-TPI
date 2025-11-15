@@ -1,5 +1,6 @@
 package progra2.Service;
 
+import java.sql.Connection;
 import java.util.List;
 import progra2.DAO.FichaBibliograficaDAO;
 import progra2.Models.FichaBibliografica;
@@ -7,6 +8,7 @@ import progra2.Models.FichaBibliografica;
 /**
  * Servicio de negocio para la gestión de fichas bibliográficas.
  * Encapsula validaciones de reglas de negocio antes de delegar al DAO.
+ * Soporta transacciones mediante conexiones externas.
  */
 public class FichaBibliograficaService implements GenericService<FichaBibliografica> {
     
@@ -18,6 +20,8 @@ public class FichaBibliograficaService implements GenericService<FichaBibliograf
         }
         this.fichaDAO = fichaDAO;
     }
+    
+    //Metodos sin transaccion
     
     @Override
     public void insertar(FichaBibliografica ficha) throws Exception {
@@ -53,6 +57,44 @@ public class FichaBibliograficaService implements GenericService<FichaBibliograf
     }
     
     
+    //metodos con transaccion 
+    
+    /**
+     * Inserta una ficha dentro de una transaccion existente
+     * @param ficha la ficha a insertar
+     * @param conn la conexxion con transaccion activa
+     */
+    
+    
+    public void insertar(FichaBibliografica ficha, Connection conn) throws Exception{
+        validarFichaParaInsercion(ficha);
+        fichaDAO.insertar(ficha, conn);
+    }
+    
+    
+    // Actualiza una ficha dentro de una transaccion existente
+    public void actualizar(FichaBibliografica ficha, Connection conn) throws Exception{
+        validarFichaParaActualizacion(ficha);
+        fichaDAO.actualizar(ficha, conn);
+    }
+    
+    
+    //Elimina una ficha dentro de una transaccion existente
+    public void eliminar(int id, Connection conn) throws Exception{
+        if (id <= 0) {
+            throw new IllegalArgumentException("El ID debe ser un numero positivo o mayor a cero");
+        }
+        fichaDAO.eliminar(id, conn);
+    }
+    
+    
+    //Obtiene una ficha por ID dentro de una transaccion existente.
+    public FichaBibliografica getById(int id, Connection conn) throws Exception{
+        if (id <= 0) {
+            throw new IllegalArgumentException("El ID deber ser un numero positivo mayor o cero");
+        }
+        return fichaDAO.getById(id, conn);
+    }
     // ==================== Métodos de Validación Privados ====================
     
     /** Valida todas las reglas de negocio para insertar una ficha nueva. */
@@ -75,6 +117,10 @@ public class FichaBibliograficaService implements GenericService<FichaBibliograf
                 throw new IllegalArgumentException(
                     "El ISBN debe tener 10 o 13 digitos (sin contar guiones). Ejemplo: 978-3-16-148410-0"
                 );
+            }
+            //Validar que no exista ya ese ISBN
+            if(fichaDAO.existeISBN(isbn)){
+                throw new IllegalArgumentException("Ya existe una ficha con el ISBN: "+ isbn);
             }
         }
         
@@ -111,8 +157,43 @@ public class FichaBibliograficaService implements GenericService<FichaBibliograf
             throw new IllegalArgumentException("No existe una ficha bibliografica con ID: " + ficha.getId());
         }
         
+        // Validar ISBN si se esta actualizando
+        if (ficha.getIsbn() != null && !ficha.getIsbn().trim().isEmpty()){
+            String isbn = ficha.getIsbn().trim();
+            
+            if(isbn.length() > 17){
+                throw new IllegalArgumentException("El ISBN no puede exceder 17 caracteres");
+            }
+            
+            String  isbnGuiones = isbn.replace("-", "");
+            if(!isbnGuiones.matches("\\d{10}|\\{13}")){
+                throw new IllegalArgumentException(
+                "El ISN debe tener 10 o 13 digitos (sin contar guiones). Ejemplo: 978-3-16-148410-0"
+                );
+            }
+            
+            //Validar que no exista ese ISBN en OTRA ficha
+            if(fichaDAO.existeISBNExceptoId(isbn, ficha.getId())){
+                throw new IllegalArgumentException("Ya existe otra ficha con el ISBN: "+ isbn);
+            }
+          
+        }
+        
         // Aplicar las mismas validaciones que en inserción
-        validarFichaParaInsercion(ficha);
+        if (ficha.getClasificacionDewey() != null && ficha.getClasificacionDewey().length() > 20){
+            throw new IllegalArgumentException("La Clasificacion Dewey no puede exceder 20 caracterees");
+        } 
+        
+        if (ficha.getEstanteria() != null && ficha.getEstanteria().length() > 200){
+            throw new IllegalArgumentException("La estanteria no puede exceder 20 caractares");
+        }
+        
+        if (ficha.getIdioma() != null && ficha.getIdioma().length() > 30){
+            throw new IllegalArgumentException ("El idoma no puede exceder 30 caracteres");
+        }
+        
+        
+        
     }
     
 }

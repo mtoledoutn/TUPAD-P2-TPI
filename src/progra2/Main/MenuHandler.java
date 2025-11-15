@@ -54,6 +54,7 @@ public class MenuHandler {
      * Flujo interactivo para crear un nuevo libro con su ficha bibliográfica.
      * Captura todos los datos necesarios y persiste el libro en la base de datos.
      * La operación es atómica: si falla, no se guarda nada.
+     * Mejorado : Usa transacciones para asegurar atomicidad
      */
     public void crearLibro() {
         try {
@@ -67,21 +68,27 @@ public class MenuHandler {
             // Opción: crear libro con o sin ficha
             System.out.print("¿Desea crear una ficha bibliografica para el libro? (S/N): ");
             String respuesta = scanner.nextLine().trim().toUpperCase();
-
-            FichaBibliografica fichaBibliografica = null;
             
             if (respuesta.equals("S")) {
+                //Caso1 : Libro con ficha -> Usar Transaccion 
                 System.out.println("\n--- Creando ficha bibliografica ---");
-                fichaBibliografica = crearFicha();
-                fichaService.insertar(fichaBibliografica);
-                System.out.println("Ficha creada con ID: " + fichaBibliografica.getId());
+                FichaBibliografica ficha = crearFicha();
+                
+                Libro libro = new Libro(0, titulo, autor, editorial, anioEdicion, null);
+                
+                //Metodo con transaccion : Si falla algo, se revierte TODO
+                libroService.insertarLibroConFicha(libro, ficha);
+                System.out.println("Libro y Ficha creados exitosamente");
+                System.out.println("- Libro ID: "+libro.getId());
+                System.out.println("- Ficha ID: "+ficha.getId());
+            }else{
+                //caso 2: libro sin ficha -> insercion simple(sin transaccion)
+                Libro libro = new Libro(0, titulo, autor, editorial, anioEdicion, null);
+                libroService.insertar(libro);
+                System.out.println("Libro Creado exitosamente con ID: "+ libro.getId());
             }
             
-            // Construcción e inserción del libro
-            Libro libro = new Libro(0, titulo, autor, editorial, anioEdicion, fichaBibliografica);
-            libroService.insertar(libro);
-            System.out.println("Libro creado exitosamente con ID: " + libro.getId());
-            
+          
         } catch (IllegalArgumentException e) {
             System.err.println("Datos invalidos: " + e.getMessage());
         } catch (Exception e) {
@@ -103,14 +110,108 @@ public class MenuHandler {
         return new FichaBibliografica(isbn, clasificacionDewey, estanteria, idioma, 0, false);
     }
     
-    /** Flujo interactivo para actualizar campos individuales de una ficha bibliográfica. */
+    /**
+     * Flujo interactivo para actualizar un libro existente.
+     * MEJORADO: Usa transacciones cuando se actualiza libro + ficha.
+     */
+    public void actualizarLibro() {
+        try {
+            System.out.println("\n========= ACTUALIZAR LIBRO =========");
+            int id = leerIdPositivo("ID del libro a actualizar");
+            
+            Libro libro = libroService.getById(id);
+            if (libro == null) {
+                System.out.println("Libro no encontrado.");
+                return;
+            }
+            
+            boolean fichaModificada = false;
+            
+            while (true) {
+                mostrarDatosLibro(libro);
+                
+                System.out.println("\nSeleccione campo a actualizar:");
+                System.out.println("1. Titulo");
+                System.out.println("2. Autor");
+                System.out.println("3. Editorial");
+                System.out.println("4. Anio de edicion");
+                System.out.println("5. Ficha bibliografica");
+                System.out.println("6. Guardar cambios y salir");
+                System.out.println("0. Cancelar sin guardar");
+                System.out.print("Opcion: ");
+
+                int opt = leerOpcionMenu(0, 6);
+                
+                switch (opt) {
+                    case 0 -> {
+                        System.out.println("Operacion cancelada.");
+                        return;
+                    }
+                    case 1 -> {
+                        String titulo = leerTexto("Nuevo titulo", true);
+                        libro.setTitulo(titulo);
+                    }
+                    case 2 -> {
+                        String autor = leerTexto("Nuevo autor", true);
+                        libro.setAutor(autor);
+                    }
+                    case 3 -> {
+                        String editorial = leerTexto("Nueva editorial", false);
+                        libro.setEditorial(editorial);
+                    }
+                    case 4 -> {
+                        Integer anio = leerAnioEdicion();
+                        libro.setAnioEdicion(anio);
+                    }
+                    case 5 -> {
+                        FichaBibliografica ficha = libro.getFichaBibliografica();
+                        if (ficha == null) {
+                            System.out.println("Este libro no tiene ficha bibliografica asociada.");
+                            System.out.print("¿Desea crear una? (S/N): ");
+                            String resp = scanner.nextLine().trim().toUpperCase();
+                            if (resp.equals("S")) {
+                                ficha = crearFicha();
+                                // Insertar la ficha primero
+                                fichaService.insertar(ficha);
+                                libro.setFichaBibliografica(ficha);
+                                fichaModificada = true;
+                                System.out.println("Ficha creada con ID: " + ficha.getId());
+                            }
+                        } else {
+                            updateFichaById(ficha);
+                            fichaModificada = true;
+                        }
+                    }
+                    case 6 -> {
+                        // GUARDAR: Usar transacción si se modificó la ficha
+                        if (fichaModificada) {
+                            // Actualizar libro + ficha en TRANSACCIÓN
+                            libroService.actualizarLibroConFicha(libro, true);
+                            System.out.println("\n✓ Libro y ficha actualizados exitosamente (con transaccion)");
+                        } else {
+                            // Solo actualizar libro (sin transacción)
+                            libroService.actualizar(libro);
+                            System.out.println("\n✓ Libro actualizado exitosamente");
+                        }
+                        return;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("\n✗ Error al actualizar libro: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Flujo interactivo para actualizar campos individuales de una ficha bibliográfica.
+     */
     private void updateFichaById(FichaBibliografica f) {
         if (f == null) {
             System.out.println("La ficha bibliografica no existe.");
             return;
         }
         
-        // Bucle de actualización hasta que el usuario decida volver
         while (true) {
             System.out.println("\n--- Ficha Actual ---");
             System.out.println("ISBN: " + f.getIsbn());
@@ -154,7 +255,9 @@ public class MenuHandler {
         }
     }
     
-    /** Lista libros según diferentes criterios de búsqueda. */
+    /**
+     * Lista libros según diferentes criterios de búsqueda.
+     */
     public void listarLibros() {
         try {
             System.out.println("\n========= LISTAR/BUSCAR LIBROS =========");
@@ -195,113 +298,64 @@ public class MenuHandler {
                 }
             }
             
-            if (libros.isEmpty()) {
-                System.out.println("No se encontraron libros.");
-                return;
-            }
+            mostrarResultadosBusqueda(libros);
             
-            System.out.println("\n========= RESULTADOS (" + libros.size() + ") =========");
-            for (Libro l : libros) {
-                System.out.println("\nID: " + l.getId());
-                System.out.println("  Titulo: " + l.getTitulo());
-                System.out.println("  Autor: " + l.getAutor());
-                System.out.println("  Editorial: " + (l.getEditorial() != null ? l.getEditorial() : "N/A"));
-                System.out.println("  Anio: " + (l.getAnioEdicion() != null ? l.getAnioEdicion() : "N/A"));
-                
-                FichaBibliografica f = l.getFichaBibliografica();
-                if (f != null) {
-                    System.out.println("  FICHA:");
-                    System.out.println("    - ISBN: " + (f.getIsbn() != null ? f.getIsbn() : "N/A"));
-                    System.out.println("    - Dewey: " + (f.getClasificacionDewey() != null ? f.getClasificacionDewey() : "N/A"));
-                    System.out.println("    - Estanteria: " + (f.getEstanteria() != null ? f.getEstanteria() : "N/A"));
-                    System.out.println("    - Idioma: " + (f.getIdioma() != null ? f.getIdioma() : "N/A"));
-                }
-            }
         } catch (Exception e) {
-            System.err.println("Error al listar libros: " + e.getMessage());
+            System.err.println("\n✗ Error al listar libros: " + e.getMessage());
+            e.printStackTrace();
         }
     }
     
-    /** Flujo interactivo para actualizar un libro existente. */
-    public void actualizarLibro() {
-        try {
-            System.out.println("\n========= ACTUALIZAR LIBRO =========");
-            int id = leerIdPositivo("ID del libro a actualizar");
+    /**
+     * Muestra los resultados de una búsqueda de libros.
+     */
+    private void mostrarResultadosBusqueda(List<Libro> libros) {
+        if (libros.isEmpty()) {
+            System.out.println("\nNo se encontraron libros.");
+            return;
+        }
+        
+        System.out.println("\n========= RESULTADOS (" + libros.size() + ") =========");
+        for (Libro l : libros) {
+            System.out.println("\nID: " + l.getId());
+            System.out.println("  Titulo: " + l.getTitulo());
+            System.out.println("  Autor: " + l.getAutor());
+            System.out.println("  Editorial: " + (l.getEditorial() != null ? l.getEditorial() : "N/A"));
+            System.out.println("  Anio: " + (l.getAnioEdicion() != null ? l.getAnioEdicion() : "N/A"));
             
-            Libro l = libroService.getById(id);
-            if (l == null) {
-                System.out.println("Libro no encontrado.");
-                return;
+            FichaBibliografica f = l.getFichaBibliografica();
+            if (f != null) {
+                System.out.println("  FICHA:");
+                System.out.println("    - ISBN: " + (f.getIsbn() != null ? f.getIsbn() : "N/A"));
+                System.out.println("    - Dewey: " + (f.getClasificacionDewey() != null ? f.getClasificacionDewey() : "N/A"));
+                System.out.println("    - Estanteria: " + (f.getEstanteria() != null ? f.getEstanteria() : "N/A"));
+                System.out.println("    - Idioma: " + (f.getIdioma() != null ? f.getIdioma() : "N/A"));
             }
-            
-            while (true) {
-                System.out.println("\n--- Libro Actual ---");
-                System.out.println("ID: " + l.getId());
-                System.out.println("Titulo: " + l.getTitulo());
-                System.out.println("Autor: " + l.getAutor());
-                System.out.println("Editorial: " + l.getEditorial());
-                System.out.println("Anio: " + l.getAnioEdicion());
-                
-                System.out.println("\nSeleccione campo a actualizar:");
-                System.out.println("1. Titulo");
-                System.out.println("2. Autor");
-                System.out.println("3. Editorial");
-                System.out.println("4. Anio de edicion");
-                System.out.println("5. Ficha bibliografica");
-                System.out.println("6. Guardar cambios y salir");
-                System.out.println("0. Cancelar sin guardar");
-                System.out.print("Opcion: ");
-
-                int opt = leerOpcionMenu(0, 6);
-                
-                switch (opt) {
-                    case 0 -> {
-                        System.out.println("Operacion cancelada.");
-                        return;
-                    }
-                    case 1 -> {
-                        String titulo = leerTexto("Nuevo titulo", true);
-                        l.setTitulo(titulo);
-                    }
-                    case 2 -> {
-                        String autor = leerTexto("Nuevo autor", true);
-                        l.setAutor(autor);
-                    }
-                    case 3 -> {
-                        String editorial = leerTexto("Nueva editorial", false);
-                        l.setEditorial(editorial);
-                    }
-                    case 4 -> {
-                        Integer anio = leerAnioEdicion();
-                        l.setAnioEdicion(anio);
-                    }
-                    case 5 -> {
-                        FichaBibliografica f = l.getFichaBibliografica();
-                        if (f == null) {
-                            System.out.println("Este libro no tiene ficha bibliografica asociada.");
-                        } else {
-                            updateFichaById(f);
-                            try {
-                                fichaService.actualizar(f);
-                                System.out.println("Ficha actualizada.");
-                            } catch (Exception e) {
-                                System.err.println("Error al actualizar ficha: " + e.getMessage());
-                            }
-                        }
-                    }
-                    case 6 -> {
-                        libroService.actualizar(l);
-                        System.out.println("Libro actualizado exitosamente.");
-                        return;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("Error al actualizar libro: " + e.getMessage());
         }
     }
     
-    /** Flujo interactivo para eliminar un libro. */
+    /**
+     * Muestra los datos actuales de un libro.
+     */
+    private void mostrarDatosLibro(Libro libro) {
+        System.out.println("\n--- Libro Actual ---");
+        System.out.println("ID: " + libro.getId());
+        System.out.println("Titulo: " + libro.getTitulo());
+        System.out.println("Autor: " + libro.getAutor());
+        System.out.println("Editorial: " + libro.getEditorial());
+        System.out.println("Anio: " + libro.getAnioEdicion());
+        
+        if (libro.getFichaBibliografica() != null) {
+            FichaBibliografica f = libro.getFichaBibliografica();
+            System.out.println("Ficha: ID=" + f.getId() + ", ISBN=" + f.getIsbn());
+        } else {
+            System.out.println("Ficha: Sin ficha bibliografica");
+        }
+    }
+    
+    /**
+     * Flujo interactivo para eliminar un libro.
+     */
     public void eliminarLibro() {
         try {
             System.out.println("\n========= ELIMINAR LIBRO =========");
@@ -320,15 +374,15 @@ public class MenuHandler {
             
             if (confirmacion.equals("S")) {
                 libroService.eliminar(id);
-                System.out.println("Libro eliminado exitosamente.");
+                System.out.println("\n✓ Libro eliminado exitosamente.");
             } else {
                 System.out.println("Operacion cancelada.");
             }
         } catch (Exception e) {
-            System.err.println("Error al eliminar libro: " + e.getMessage());
+            System.err.println("\n✗ Error al eliminar libro: " + e.getMessage());
+            e.printStackTrace();
         }
     }
-    
     
     // =================== Métodos Auxiliares de Validación ===================
     
