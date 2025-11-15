@@ -2,70 +2,107 @@ package progra2.Models;
 
 public class FichaBibliografica extends BaseModel {
     
-    /** JAVADOC AQUÍ */
+    /** ISBN del libro (opcional). */
     private String isbn;
-    /** JAVADOC AQUÍ */
+    /** Clasificación Dewey (opcional). */
     private String clasificacion_dewey;
-    /** JAVADOC AQUÍ */
+    /** Ubicación en estantería (opcional). */
     private String estanteria;
-    /** JAVADOC AQUÍ */
+    /** Idioma del libro (opcional). */
     private String idioma;
 
-    /** JAVADOC AQUÍ */
+    /**
+     * Constructor completo para crear una ficha bibliográfica.
+     * @param isbn código ISBN
+     * @param clasificacionDewey clasificación decimal Dewey
+     * @param estanteria ubicación física
+     * @param idioma idioma del contenido
+     * @param id identificador
+     * @param eliminado estado de eliminación lógica
+     */
     public FichaBibliografica(String isbn, String clasificacionDewey, String estanteria, String idioma, int id, boolean eliminado) {
-        super(id, false);
+        super(id, eliminado);
         this.isbn = isbn;
         this.clasificacion_dewey = clasificacionDewey;
         this.estanteria = estanteria;
         this.idioma = idioma;
     }
     
-    /** JAVADOC AQUÍ */
+    /** Constructor vacío para instanciación sin datos. */
     public FichaBibliografica() {
         super();
     }
     
-    /** JAVADOC AQUÍ */
+    /** Obtiene el ISBN de la ficha.
+     * @return  ISBN de la ficha
+     */
     public String getIsbn() {
         return isbn;
     }
     
-    /** JAVADOC AQUÍ */
+    /**
+     * Establece el ISBN a la ficha.
+     * 
+     * @param isbn Nuevo ISBN de la ficha
+     */
     public void setIsbn(String isbn) {
         this.isbn = isbn;
     }
     
-    /** JAVADOC AQUÍ */
+    /** Obtiene la clasificación dewey de la ficha.
+     * @return  Clasificación Dewey de la ficha
+     */
     public String getClasificacionDewey() {
         return clasificacion_dewey;
     }
     
-    /** JAVADOC AQUÍ */
+    /**
+     * Establece la clasificación dewey a la ficha.
+     * 
+     * @param clasificacionDewey Nueva clasificación dewey de la ficha
+     */
     public void setClasificacionDewey(String clasificacionDewey) {
         this.clasificacion_dewey = clasificacionDewey;
     }
     
-    /** JAVADOC AQUÍ */
+    /** Obtiene el número de ubicación física en estantería de la ficha.
+     * @return  Estantería de la ficha
+     */
     public String getEstanteria() {
         return estanteria;
     }
     
-    /** JAVADOC AQUÍ */
+    /**
+     * Establece el número de ubicación física en estantería a la ficha.
+     * 
+     * @param estanteria Nuevo número de estantería de la ficha
+     */
     public void setEstanteria(String estanteria) {
         this.estanteria = estanteria;
     }
     
-    /** JAVADOC AQUÍ */
+    /** Obtiene el idioma de la ficha.
+     * @return  Idioma de la ficha
+     */
     public String getIdioma() {
         return idioma;
     }
     
-    /** JAVADOC AQUÍ */
+    /**
+     * Establece el idioma a la ficha.
+     * 
+     * @param idioma Nuevo idioma de la ficha
+     */
     public void setIdioma(String idioma) {
         this.idioma = idioma;
     }
     
-    /** JAVADOC AQUÍ */
+    /**
+     * Representación en texto de la ficha bibliográfica.
+     * Útil para debugging y logging.
+     *
+     * @return String con todos los campos de la ficha bibliográfica
+     */
     @Override
     public String toString() {
         return "Ficha Bibliografica{" +

@@ -34,22 +34,15 @@ public class FichaBibliograficaService implements GenericService<FichaBibliograf
     @Override
     public void eliminar(int id) throws Exception {
         if (id <= 0) {
-            throw new IllegalArgumentException("El ID debe ser un número positivo mayor a cero");
+            throw new IllegalArgumentException("El ID debe ser un numero positivo mayor a cero");
         }
-        
-        // Verificar que la ficha existe antes de intentar eliminarla
-        FichaBibliografica fichaExistente = fichaDAO.getById(id);
-        if (fichaExistente == null) {
-            throw new IllegalArgumentException("No existe una ficha bibliográfica con ID: " + id);
-        }
-        
         fichaDAO.eliminar(id);
     }
     
     @Override
     public FichaBibliografica getById(int id) throws Exception {
         if (id <= 0) {
-            throw new IllegalArgumentException("El ID debe ser un número positivo mayor a cero");
+            throw new IllegalArgumentException("El ID debe ser un numero positivo mayor a cero");
         }
         return fichaDAO.getById(id);
     }
@@ -62,12 +55,10 @@ public class FichaBibliograficaService implements GenericService<FichaBibliograf
     
     // ==================== Métodos de Validación Privados ====================
     
-    /**
-     * Valida todas las reglas de negocio para insertar una ficha nueva.
-     */
+    /** Valida todas las reglas de negocio para insertar una ficha nueva. */
     private void validarFichaParaInsercion(FichaBibliografica ficha) throws Exception {
         if (ficha == null) {
-            throw new IllegalArgumentException("La ficha bibliográfica no puede ser null");
+            throw new IllegalArgumentException("La ficha bibliografica no puede ser null");
         }
         
         // Validar ISBN (opcional pero con formato específico)
@@ -78,23 +69,23 @@ public class FichaBibliograficaService implements GenericService<FichaBibliograf
                 throw new IllegalArgumentException("El ISBN no puede exceder 17 caracteres");
             }
             
-            // Remover guiones para validar longitud de dígitos
+            // Validar que sean dígitos (con o sin guiones)
             String isbnSinGuiones = isbn.replace("-", "");
-            if (isbnSinGuiones.length() != 10 && isbnSinGuiones.length() != 13) {
+            if (!isbnSinGuiones.matches("\\d{10}|\\d{13}")) {
                 throw new IllegalArgumentException(
-                    "El ISBN debe tener 10 o 13 dígitos (sin contar guiones). Ejemplo: 978-3-16-148410-0"
+                    "El ISBN debe tener 10 o 13 digitos (sin contar guiones). Ejemplo: 978-3-16-148410-0"
                 );
             }
         }
         
         // Validar clasificación Dewey (opcional pero con longitud máxima)
         if (ficha.getClasificacionDewey() != null && ficha.getClasificacionDewey().length() > 20) {
-            throw new IllegalArgumentException("La clasificación Dewey no puede exceder 20 caracteres");
+            throw new IllegalArgumentException("La clasificacion Dewey no puede exceder 20 caracteres");
         }
         
         // Validar estantería (opcional pero con longitud máxima)
         if (ficha.getEstanteria() != null && ficha.getEstanteria().length() > 20) {
-            throw new IllegalArgumentException("La estantería no puede exceder 20 caracteres");
+            throw new IllegalArgumentException("La estanteria no puede exceder 20 caracteres");
         }
         
         // Validar idioma (opcional pero con longitud máxima)
@@ -103,23 +94,21 @@ public class FichaBibliograficaService implements GenericService<FichaBibliograf
         }
     }
     
-    /**
-     * Valida todas las reglas de negocio para actualizar una ficha existente.
-     */
+    /** Valida todas las reglas de negocio para actualizar una ficha existente. */
     private void validarFichaParaActualizacion(FichaBibliografica ficha) throws Exception {
         if (ficha == null) {
-            throw new IllegalArgumentException("La ficha bibliográfica no puede ser null");
+            throw new IllegalArgumentException("La ficha bibliografica no puede ser null");
         }
         
         // Validar que el ID sea válido
         if (ficha.getId() <= 0) {
-            throw new IllegalArgumentException("El ID de la ficha debe ser un número positivo mayor a cero");
+            throw new IllegalArgumentException("El ID de la ficha debe ser un numero positivo mayor a cero");
         }
         
         // Verificar que la ficha existe
         FichaBibliografica fichaExistente = fichaDAO.getById(ficha.getId());
         if (fichaExistente == null) {
-            throw new IllegalArgumentException("No existe una ficha bibliográfica con ID: " + ficha.getId());
+            throw new IllegalArgumentException("No existe una ficha bibliografica con ID: " + ficha.getId());
         }
         
         // Aplicar las mismas validaciones que en inserción

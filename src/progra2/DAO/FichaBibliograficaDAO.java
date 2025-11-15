@@ -34,30 +34,16 @@ public class FichaBibliograficaDAO implements GenericDAO<FichaBibliografica> {
     
     /** JAVADOC AQUÍ */
     @Override
-    public void insertTx(FichaBibliografica fichaBibliografica, Connection conn) throws SQLException {
-        try (PreparedStatement stmt = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
-            
-            setFichaParameters(stmt, fichaBibliografica);
-            stmt.executeUpdate();
-            setGeneratedId(stmt, fichaBibliografica);
-        }
-    }
-    
-    /** JAVADOC AQUÍ */
-    @Override
-    public void actualizar(FichaBibliografica fichaBibliografica) throws SQLException {
+    public void actualizar(FichaBibliografica ficha) throws SQLException {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(UPDATE_SQL)) {
-            
-            stmt.setString(1, fichaBibliografica.getIsbn());
-            stmt.setString(2, fichaBibliografica.getClasificacionDewey());
-            stmt.setString(3, fichaBibliografica.getEstanteria());
-            stmt.setString(4, fichaBibliografica.getIdioma());
-            stmt.setInt(5, fichaBibliografica.getId());
-            
+
+            setFichaParameters(stmt, ficha);
+            stmt.setInt(5, ficha.getId());
+
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected == 0) {
-                throw new SQLException("No se pudo actualizar la ficha con ID: " + fichaBibliografica.getId());
+                throw new SQLException("No se pudo actualizar la ficha con ID: " + ficha.getId());
             }
         }
     }
