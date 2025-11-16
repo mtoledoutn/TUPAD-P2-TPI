@@ -9,13 +9,14 @@ import java.sql.SQLException;
  */
 public class TransactionManager implements AutoCloseable {
     
-    /** JAVADOC AQUÍ */
+    /** Conexión de base de datos administrada por este manager. */
     private Connection conn;
-    /** JAVADOC AQUÍ */
+    /** Indica si hay una transacción activa en este momento. */
     private boolean transactionActive;
     
     /**
      * Constructor que recibe una conexión ya establecida.
+     * 
      * @param conn conexión a la base de datos
      * @throws SQLException si la conexión es inválida
      */
@@ -29,6 +30,7 @@ public class TransactionManager implements AutoCloseable {
     
     /**
      * Obtiene la conexión administrada.
+     * 
      * @return conexión de base de datos
      */
     public Connection getConnection() {
@@ -37,6 +39,7 @@ public class TransactionManager implements AutoCloseable {
     
     /**
      * Inicia una transacción deshabilitando autocommit.
+     * 
      * @throws SQLException si hay error al configurar la conexión
      */
     public void startTransaction() throws SQLException {
@@ -52,6 +55,7 @@ public class TransactionManager implements AutoCloseable {
     
     /**
      * Confirma todos los cambios de la transacción activa.
+     * 
      * @throws SQLException si hay error al hacer commit
      */
     public void commit() throws SQLException {
@@ -101,6 +105,7 @@ public class TransactionManager implements AutoCloseable {
     
     /**
      * Verifica si hay una transacción activa.
+     * 
      * @return true si hay transacción en curso
      */
     public boolean isTransactionActive() {

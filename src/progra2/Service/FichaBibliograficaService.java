@@ -12,8 +12,15 @@ import progra2.Models.FichaBibliografica;
  */
 public class FichaBibliograficaService implements GenericService<FichaBibliografica> {
     
+    /** DAO para operaciones de persistencia de fichas bibliográficas. */
     private final FichaBibliograficaDAO fichaDAO;
     
+    /**
+     * Constructor que recibe el DAO necesario para operaciones de persistencia.
+     * 
+     * @param fichaDAO DAO para operaciones con fichas bibliográficas
+     * @throws IllegalArgumentException si fichaDAO es null
+     */
     public FichaBibliograficaService(FichaBibliograficaDAO fichaDAO) {
         if (fichaDAO == null) {
             throw new IllegalArgumentException("FichaBibliograficaDAO no puede ser null");
@@ -23,6 +30,14 @@ public class FichaBibliograficaService implements GenericService<FichaBibliograf
     
     // ======================= Métodos sin transaccion =======================
     
+    /**
+     * Inserta una nueva ficha bibliográfica en la base de datos.
+     * Realiza validaciones de negocio y normalización antes de persistir.
+     * Crea su propia conexión y la cierra automáticamente.
+     * 
+     * @param ficha la ficha a insertar
+     * @throws Exception si hay error en validación o inserción
+     */
     @Override
     public void insertar(FichaBibliografica ficha) throws Exception {
         validarFichaParaInsercion(ficha);
@@ -30,6 +45,14 @@ public class FichaBibliograficaService implements GenericService<FichaBibliograf
         fichaDAO.insertar(ficha);
     }
     
+    /**
+     * Actualiza una ficha bibliográfica existente en la base de datos.
+     * Realiza validaciones de negocio y normalización antes de persistir.
+     * Crea su propia conexión y la cierra automáticamente.
+     * 
+     * @param ficha la ficha con datos actualizados
+     * @throws Exception si hay error en validación o actualización
+     */
     @Override
     public void actualizar(FichaBibliografica ficha) throws Exception {
         validarFichaParaActualizacion(ficha);
@@ -37,6 +60,14 @@ public class FichaBibliograficaService implements GenericService<FichaBibliograf
         fichaDAO.actualizar(ficha);
     }
     
+    /**
+     * Elimina lógicamente una ficha bibliográfica por su ID.
+     * Crea su propia conexión y la cierra automáticamente.
+     * 
+     * @param id identificador de la ficha a eliminar
+     * @throws IllegalArgumentException si el ID es inválido
+     * @throws Exception si hay error en la eliminación
+     */
     @Override
     public void eliminar(int id) throws Exception {
         if (id <= 0) {
@@ -45,6 +76,15 @@ public class FichaBibliograficaService implements GenericService<FichaBibliograf
         fichaDAO.eliminar(id);
     }
     
+    /**
+     * Obtiene una ficha bibliográfica por su ID.
+     * Crea su propia conexión y la cierra automáticamente.
+     * 
+     * @param id identificador de la ficha
+     * @return la ficha encontrada o null si no existe
+     * @throws IllegalArgumentException si el ID es inválido
+     * @throws Exception si hay error en la consulta
+     */
     @Override
     public FichaBibliografica getById(int id) throws Exception {
         if (id <= 0) {
@@ -53,6 +93,13 @@ public class FichaBibliograficaService implements GenericService<FichaBibliograf
         return fichaDAO.getById(id);
     }
     
+    /**
+     * Obtiene todas las fichas bibliográficas no eliminadas.
+     * Crea su propia conexión y la cierra automáticamente.
+     * 
+     * @return lista de fichas bibliográficas
+     * @throws Exception si hay error en la consulta
+     */
     @Override
     public List<FichaBibliografica> getAll() throws Exception {
         return fichaDAO.getAll();
@@ -62,9 +109,13 @@ public class FichaBibliograficaService implements GenericService<FichaBibliograf
     // ======================= Métodos con transaccion =======================
     
     /**
-     * Inserta una ficha dentro de una transaccion existente.
+     * Inserta una ficha dentro de una transacción existente.
+     * Realiza validaciones de negocio y normalización antes de persistir.
+     * No cierra la conexión (debe ser manejada por el llamador).
+     * 
      * @param ficha la ficha a insertar
-     * @param conn la conexxion con transaccion activa
+     * @param conn la conexión con transacción activa
+     * @throws Exception si hay error en validación o inserción
      */
     public void insertar(FichaBibliografica ficha, Connection conn) throws Exception {
         validarFichaParaInsercion(ficha);
@@ -73,7 +124,15 @@ public class FichaBibliograficaService implements GenericService<FichaBibliograf
     }
     
     
-    /** Actualiza una ficha dentro de una transaccion existente. */
+    /**
+     * Actualiza una ficha dentro de una transacción existente.
+     * Realiza validaciones de negocio y normalización antes de persistir.
+     * No cierra la conexión (debe ser manejada por el llamador).
+     * 
+     * @param ficha la ficha con datos actualizados
+     * @param conn la conexión con transacción activa
+     * @throws Exception si hay error en validación o actualización
+     */
     public void actualizar(FichaBibliografica ficha, Connection conn) throws Exception {
         validarFichaParaActualizacion(ficha);
         normalizarFicha(ficha);
@@ -81,7 +140,15 @@ public class FichaBibliograficaService implements GenericService<FichaBibliograf
     }
     
     
-    /** Elimina una ficha dentro de una transaccion existente. */
+    /**
+     * Elimina una ficha dentro de una transacción existente.
+     * No cierra la conexión (debe ser manejada por el llamador).
+     * 
+     * @param id identificador de la ficha a eliminar
+     * @param conn la conexión con transacción activa
+     * @throws IllegalArgumentException si el ID es inválido
+     * @throws Exception si hay error en la eliminación
+     */
     public void eliminar(int id, Connection conn) throws Exception {
         if (id <= 0) {
             throw new IllegalArgumentException("El ID debe ser un numero positivo o mayor a cero");
@@ -90,7 +157,16 @@ public class FichaBibliograficaService implements GenericService<FichaBibliograf
     }
     
     
-    /** Obtiene una ficha por ID dentro de una transaccion existente. */
+    /**
+     * Obtiene una ficha por ID dentro de una transacción existente.
+     * No cierra la conexión (debe ser manejada por el llamador).
+     * 
+     * @param id identificador de la ficha
+     * @param conn la conexión con transacción activa
+     * @return la ficha encontrada o null si no existe
+     * @throws IllegalArgumentException si el ID es inválido
+     * @throws Exception si hay error en la consulta
+     */
     public FichaBibliografica getById(int id, Connection conn) throws Exception {
         if (id <= 0) {
             throw new IllegalArgumentException("El ID deber ser un numero positivo mayor o cero");
@@ -101,7 +177,13 @@ public class FichaBibliograficaService implements GenericService<FichaBibliograf
     
     // ==================== Métodos de Validación Privados ====================
     
-    /** Normaliza los campos de texto de la ficha convirtiéndolos a mayúsculas. */
+    /**
+     * Normaliza los campos de texto de la ficha convirtiéndolos a mayúsculas.
+     * Aplica trim() para eliminar espacios en blanco y toUpperCase() para uniformidad.
+     * Solo normaliza campos no nulos.
+     * 
+     * @param ficha la ficha cuyos campos serán normalizados
+     */
     private void normalizarFicha(FichaBibliografica ficha) {
         if (ficha.getIsbn() != null) {
             ficha.setIsbn(ficha.getIsbn().trim().toUpperCase());
@@ -117,7 +199,20 @@ public class FichaBibliograficaService implements GenericService<FichaBibliograf
         }
     }
     
-    /** Valida todas las reglas de negocio para insertar una ficha nueva. */
+    /**
+     * Valida todas las reglas de negocio para insertar una ficha nueva.
+     * 
+     * Verifica que:
+     * - La ficha no sea null.
+     * - El ISBN tenga formato válido (10 o 13 dígitos) y no exista ya.
+     * - La clasificación Dewey no exceda 20 caracteres.
+     * - La estantería no exceda 20 caracteres.
+     * - El idioma no exceda 30 caracteres.
+     * 
+     * @param ficha la ficha a validar
+     * @throws IllegalArgumentException si alguna validación falla
+     * @throws Exception si hay error en la validación
+     */
     private void validarFichaParaInsercion(FichaBibliografica ficha) throws Exception {
         if (ficha == null) {
             throw new IllegalArgumentException("La ficha bibliografica no puede ser null");
@@ -161,7 +256,16 @@ public class FichaBibliograficaService implements GenericService<FichaBibliograf
         }
     }
     
-    /** Valida todas las reglas de negocio para actualizar una ficha existente. */
+    /**
+     * Valida todas las reglas de negocio para actualizar una ficha existente.
+     * Primero verifica que la ficha exista en la base de datos,
+     * luego valida el formato del ISBN asegurándose de que no exista en otra ficha,
+     * y finalmente valida las longitudes de los demás campos.
+     * 
+     * @param ficha la ficha a validar
+     * @throws IllegalArgumentException si el ID es inválido o no existe
+     * @throws Exception si alguna validación falla
+     */
     private void validarFichaParaActualizacion(FichaBibliografica ficha) throws Exception {
         if (ficha == null) {
             throw new IllegalArgumentException("La ficha bibliografica no puede ser null");

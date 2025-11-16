@@ -6,7 +6,9 @@ package progra2.Main;
  */
 public class MenuDisplay {
     
-    /** Muestra el menú principal con las opciones iniciales del sistema.
+    /** 
+     * Muestra el menú principal con las opciones iniciales del sistema.
+     * 
      * Opciones:
      * 1. Gestion de libros
      * 2. Verificar conexión a la Base de Datos

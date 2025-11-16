@@ -14,12 +14,17 @@ import progra2.Models.Libro;
  */
 public class LibroService implements GenericService<Libro> {
     
-    /** JAVADOC AQUÍ */
+    /** DAO para operaciones de persistencia de libros. */
     private final LibroDAO libroDAO;
-    /** JAVADOC AQUÍ */
+    /** Servicio para gestionar fichas bibliográficas asociadas. */
     private final FichaBibliograficaService fichaBibliograficaService;
     
-    /** JAVADOC AQUÍ */
+    /**
+     * Constructor básico que solo recibe el DAO de libros.
+     * No permite operaciones con fichas bibliográficas.
+     * 
+     * @param libroDAO DAO para operaciones de persistencia
+     */
     public LibroService(LibroDAO libroDAO) {
         this.libroDAO = libroDAO;
         this.fichaBibliograficaService = null;
@@ -27,6 +32,7 @@ public class LibroService implements GenericService<Libro> {
     
     /**
      * Constructor que recibe las dependencias necesarias.
+     * 
      * @param libroDAO DAO para operaciones de persistencia
      * @param fichaBibliograficaService servicio para validar fichas bibliográficas
      */
@@ -43,7 +49,13 @@ public class LibroService implements GenericService<Libro> {
     
     // ======================= Métodos sin transsacion =======================
     
-    /** JAVADOC AQUÍ */
+    /**
+     * Inserta un nuevo libro en la base de datos.
+     * Realiza validaciones de negocio antes de persistir.
+     * 
+     * @param libro el libro a insertar
+     * @throws Exception si hay error en validación o inserción
+     */
     @Override
     public void insertar(Libro libro) throws Exception {
         validarLibroParaInsercion(libro);
@@ -51,7 +63,13 @@ public class LibroService implements GenericService<Libro> {
         libroDAO.insertar(libro);
     }
     
-    /** JAVADOC AQUÍ */
+    /**
+     * Actualiza un libro existente en la base de datos.
+     * Realiza validaciones de negocio antes de persistir.
+     * 
+     * @param libro el libro con datos actualizados
+     * @throws Exception si hay error en validación o actualización
+     */
     @Override
     public void actualizar(Libro libro) throws Exception {
         validarLibroParaActualizacion(libro);
@@ -59,7 +77,12 @@ public class LibroService implements GenericService<Libro> {
         libroDAO.actualizar(libro);
     }
     
-    /** JAVADOC AQUÍ */
+    /**
+     * Elimina lógicamente un libro por su ID.
+     * 
+     * @param id identificador del libro a eliminar
+     * @throws Exception si el ID es inválido o hay error en la eliminación
+     */
     @Override
     public void eliminar(int id) throws Exception {
         if (id <= 0) {
@@ -68,7 +91,13 @@ public class LibroService implements GenericService<Libro> {
         libroDAO.eliminar(id);
     }
     
-    /** JAVADOC AQUÍ */
+    /**
+     * Obtiene un libro por su ID.
+     * 
+     * @param id identificador del libro
+     * @return el libro encontrado o null si no existe
+     * @throws Exception si el ID es inválido o hay error en la consulta
+     */
     @Override
     public Libro getById(int id) throws Exception {
         if (id <= 0) {
@@ -77,7 +106,12 @@ public class LibroService implements GenericService<Libro> {
         return libroDAO.getById(id);
     }
     
-    /** JAVADOC AQUÍ */
+    /**
+     * Obtiene todos los libros no eliminados.
+     * 
+     * @return lista de todos los libros
+     * @throws Exception si hay error en la consulta
+     */
     @Override
     public List<Libro> getAll() throws Exception {
         return libroDAO.getAll();
@@ -86,7 +120,13 @@ public class LibroService implements GenericService<Libro> {
     
     // ========================= Métodos de busqueda =========================
     
-    /** JAVADOC AQUÍ */
+    /**
+     * Busca libros cuyo título contenga el texto especificado.
+     * 
+     * @param titulo texto a buscar (búsqueda parcial, case-insensitive)
+     * @return lista de libros que coinciden
+     * @throws Exception si el título está vacío o hay error en la consulta
+     */
     public List<Libro> buscarPorTitulo(String titulo) throws Exception {
         if (titulo == null || titulo.trim().isEmpty()) {
             throw new IllegalArgumentException("El titulo de busqueda no puede estar vacio");
@@ -94,7 +134,13 @@ public class LibroService implements GenericService<Libro> {
         return libroDAO.getByTitulo(titulo);
     }
     
-    /** JAVADOC AQUÍ */
+    /**
+     * Busca libros cuyo autor contenga el texto especificado.
+     * 
+     * @param autor texto a buscar (búsqueda parcial, case-insensitive)
+     * @return lista de libros que coinciden
+     * @throws Exception si el autor está vacío o hay error en la consulta
+     */
     public List<Libro> buscarPorAutor(String autor) throws Exception {
         if (autor == null || autor.trim().isEmpty()) {
             throw new IllegalArgumentException("El autor de busqueda no puede estar vacio");
@@ -102,7 +148,13 @@ public class LibroService implements GenericService<Libro> {
         return libroDAO.getByAutor(autor);
     }
     
-    /** JAVADOC AQUÍ */
+    /**
+     * Busca libros cuya editorial contenga el texto especificado.
+     * 
+     * @param editorial texto a buscar (búsqueda parcial, case-insensitive)
+     * @return lista de libros que coinciden
+     * @throws Exception si la editorial está vacía o hay error en la consulta
+     */
     public List<Libro> buscarPorEditorial(String editorial) throws Exception {
         if (editorial == null || editorial.trim().isEmpty()) {
             throw new IllegalArgumentException("La editorial de busqueda no puede estar vacia");
@@ -110,7 +162,13 @@ public class LibroService implements GenericService<Libro> {
         return libroDAO.getByEditorial(editorial);
     }
     
-    /** JAVADOC AQUÍ */
+    /**
+     * Busca libros publicados en un año específico.
+     * 
+     * @param anio año de publicación (debe estar entre 1000 y año actual)
+     * @return lista de libros publicados en ese año
+     * @throws Exception si el año es inválido o hay error en la consulta
+     */
     public List<Libro> buscarPorAnioPublicacion(int anio) throws Exception {
         int anioActual = java.time.Year.now().getValue();
         if (anio < 1000 || anio > anioActual) {
@@ -119,7 +177,13 @@ public class LibroService implements GenericService<Libro> {
         return libroDAO.getByAnioEdicion(anio);
     }
     
-    /** JAVADOC AQUÍ */
+    /**
+     * Busca libros por idioma (basado en la ficha bibliográfica).
+     * 
+     * @param idioma idioma a buscar (comparación exacta, case-insensitive)
+     * @return lista de libros en ese idioma
+     * @throws Exception si el idioma está vacío o hay error en la consulta
+     */
     public List<Libro> buscarPorIdioma(String idioma) throws Exception {
         if (idioma == null || idioma.trim().isEmpty()) {
             throw new IllegalArgumentException("El idioma de busqueda no puede estar vacio");
@@ -211,7 +275,13 @@ public class LibroService implements GenericService<Libro> {
     
     // ==================== Métodos de Validación Privados ====================
     
-    /** Normaliza los campos de texto del libro convirtiéndolos a mayúsculas. */
+    /**
+     * Normaliza los campos de texto del libro convirtiéndolos a mayúsculas.
+     * Aplica trim() para eliminar espacios en blanco y toUpperCase() para uniformidad.
+     * Solo normaliza campos no nulos.
+     * 
+     * @param libro el libro cuyos campos serán normalizados
+     */
     private void normalizarLibro(Libro libro) {
         if (libro.getTitulo() != null) {
             libro.setTitulo(libro.getTitulo().trim().toUpperCase());
@@ -224,7 +294,20 @@ public class LibroService implements GenericService<Libro> {
         }
     }
     
-    /** Valida todas las reglas de negocio para insertar un libro nuevo. */
+    /**
+     * Valida todas las reglas de negocio para insertar un libro nuevo.
+     * 
+     * Verifica que:
+     * - El libro no sea null.
+     * - El título sea obligatorio y no exceda 150 caracteres.
+     * - El autor sea obligatorio y no exceda 120 caracteres.
+     * - La editorial no exceda 100 caracteres (opcional).
+     * - El año de edición esté entre 1000 y el año actual (opcional).
+     * 
+     * @param libro el libro a validar
+     * @throws IllegalArgumentException si alguna validación falla
+     * @throws Exception si hay error en la validación
+    */
     private void validarLibroParaInsercion(Libro libro) throws Exception {
         if (libro == null) {
             throw new IllegalArgumentException("El libro no puede ser null");
@@ -263,7 +346,15 @@ public class LibroService implements GenericService<Libro> {
         }
     }
     
-    /** Valida todas las reglas de negocio para actualizar un libro existente. */
+    /**
+     * Valida todas las reglas de negocio para actualizar un libro existente.
+     * Primero verifica que el libro exista en la base de datos,
+     * luego aplica las mismas validaciones que para inserción.
+     * 
+     * @param libro el libro a validar
+     * @throws IllegalArgumentException si el ID es inválido o no existe
+     * @throws Exception si alguna validación falla
+     */
     private void validarLibroParaActualizacion(Libro libro) throws Exception {
         if (libro == null) {
             throw new IllegalArgumentException("El libro no puede ser null");
