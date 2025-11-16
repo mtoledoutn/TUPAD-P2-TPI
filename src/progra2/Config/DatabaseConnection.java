@@ -4,7 +4,16 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-/** JAVADOC AQUÍ */
+/**
+ * Clase utilitaria singleton para gestionar conexiones JDBC a MySQL.
+ * Encapsula la configuración de la base de datos y proporciona
+ * un punto centralizado para obtener conexiones.
+ * 
+ * La configuración puede ser sobrescrita mediante propiedades del sistema:
+ * - Ddb.url: URL de conexión JDBC
+ * - Ddb.user: Usuario de la base de datos
+ * - Ddb.password: Contraseña del usuario
+ */
 public final class DatabaseConnection {
     
     /** URL de conexión JDBC. Configurable via -Ddb.url */
@@ -16,7 +25,12 @@ public final class DatabaseConnection {
     /** Contraseña del usuario. Configurable via -Ddb.password */
     private static final String PASSWORD = System.getProperty("db.password", "");
     
-    /** JAVADOC AQUÍ */
+    /**
+     * Bloque estático que carga el driver JDBC y valida la configuración.
+     * Se ejecuta al cargar la clase por primera vez.
+     * 
+     * @throws ExceptionInInitializerError si el driver no se encuentra o la configuración es inválida
+     */
     static {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -28,17 +42,33 @@ public final class DatabaseConnection {
         }
     }
     
-    /** JAVADOC AQUÍ */
+    /**
+     * Constructor privado para prevenir instanciación.
+     * Esta clase solo debe usarse de forma estática.
+     * 
+     * @throws UnsupportedOperationException siempre que se intente instanciar
+     */
     private DatabaseConnection() {
         throw new UnsupportedOperationException("Esta es una clase utilitaria y no debe ser instanciada");
     }
     
-    /** JAVADOC AQUÍ */
+    /**
+     * Obtiene una nueva conexión a la base de datos.
+     * Cada llamada genera una conexión independiente que debe cerrarse manualmente.
+     * 
+     * @return conexión JDBC activa a la base de datos
+     * @throws SQLException si no se puede establecer la conexión
+     */
     public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }
     
-    /** JAVADOC AQUÍ */
+    /**
+     * Valida que los parámetros de configuración sean válidos.
+     * Verifica que URL y USER no estén vacíos, y que PASSWORD no sea null.
+     * 
+     * @throws IllegalStateException si algún parámetro es inválido
+     */
     private static void validateConfiguration() {
         if (URL == null || URL.trim().isEmpty()) {
             throw new IllegalStateException("La URL de la base de datos no esta configurada");

@@ -45,7 +45,10 @@ public class MenuHandler {
         this.fichaService = fichaService;
     }
     
-    /** Método que verifica la conexión a la base de datos. */
+    /**
+    * Verifica la conexión a la base de datos.
+    * Delega la verificación a la clase TestConexion.
+    */
     public void verificarConexion() {
         TestConexion.main(null);
     }
@@ -96,6 +99,7 @@ public class MenuHandler {
     
     /**
      * Captura los datos necesarios para crear una ficha bibliográfica.
+     * Solicita interactivamente ISBN, clasificación Dewey, estantería e idioma.
      * 
      * @return instancia de FichaBibliografica con los datos capturados
      */
@@ -201,7 +205,13 @@ public class MenuHandler {
         }
     }
     
-    /** Flujo interactivo para actualizar campos individuales de una ficha bibliográfica. */
+    /**
+     * Flujo interactivo para actualizar campos individuales de una ficha bibliográfica.
+     * Presenta un menú cíclico que permite modificar ISBN, clasificación Dewey,
+     * estantería e idioma hasta que el usuario elija volver.
+     * 
+     * @param f la ficha a actualizar (debe tener ID válido)
+    */
     private void updateFichaById(FichaBibliografica f) {
         if (f == null) {
             System.out.println("La ficha bibliografica no existe.");
@@ -300,7 +310,13 @@ public class MenuHandler {
         }
     }
     
-    /** Muestra los resultados de una búsqueda de libros. */
+    /**
+     * Muestra los resultados de una búsqueda de libros en formato legible.
+     * Si no hay resultados, muestra un mensaje informativo.
+     * Para cada libro encontrado, muestra datos básicos y ficha bibliográfica si existe.
+     * 
+     * @param libros lista de libros resultado de la búsqueda
+     */
     private void mostrarResultadosBusqueda(List<Libro> libros) {
         if (libros.isEmpty()) {
             System.out.println("\nNo se encontraron libros.");
@@ -326,7 +342,12 @@ public class MenuHandler {
         }
     }
     
-    /** Muestra los datos actuales de un libro. */
+    /**
+     * Muestra los datos actuales de un libro en formato legible.
+     * Incluye información básica del libro y de su ficha bibliográfica si tiene.
+     * 
+     * @param libro el libro cuyos datos se mostrarán
+     */
     private void mostrarDatosLibro(Libro libro) {
         System.out.println("\n--- Libro Actual ---");
         System.out.println("ID: " + libro.getId());
@@ -376,7 +397,12 @@ public class MenuHandler {
     
     /**
      * Lee una opción de menú válida dentro de un rango específico.
-     * Repite hasta obtener un número válido o que el usuario ingrese 0 para salir.
+     * Repite la solicitud hasta obtener un número válido dentro del rango.
+     * Maneja entradas vacías y valores fuera de rango.
+     * 
+     * @param min valor mínimo aceptado (inclusive)
+     * @param max valor máximo aceptado (inclusive)
+     * @return opción válida seleccionada por el usuario
      */
     private int leerOpcionMenu(int min, int max) {
         while (true) {
@@ -398,7 +424,15 @@ public class MenuHandler {
         }
     }
     
-    /** Lee un ID positivo mayor a cero, repitiendo hasta obtener un valor válido. */
+    /**
+     * Lee un ID positivo mayor a cero, repitiendo hasta obtener un valor válido.
+     * Permite cancelar la operación ingresando 0.
+     * Maneja entradas vacías y valores no numéricos.
+     * 
+     * @param mensaje texto descriptivo a mostrar al usuario
+     * @return ID válido mayor a cero
+     * @throws RuntimeException si el usuario cancela ingresando 0
+     */
     private int leerIdPositivo(String mensaje) {
         while (true) {
             try {
@@ -424,7 +458,16 @@ public class MenuHandler {
         }
     }
     
-    /** Lee un texto obligatorio u opcional según el parámetro. */
+    /**
+     * Lee un texto obligatorio u opcional según el parámetro.
+     * Si es obligatorio, repite hasta obtener un valor no vacío.
+     * Si es opcional, permite valores vacíos retornando null.
+     * Aplica trim() y toUpperCase() automáticamente.
+     * 
+     * @param campo nombre del campo a solicitar (para mensajes)
+     * @param obligatorio true si el campo es requerido, false si es opcional
+     * @return texto ingresado (normalizado) o null si es opcional y está vacío
+     */
     private String leerTexto(String campo, boolean obligatorio) {
         while (true) {
             System.out.print(campo + (obligatorio ? ": " : " (Enter para omitir): "));
@@ -442,7 +485,13 @@ public class MenuHandler {
         }
     }
     
-    /** Lee una clasificación dewey válida (opcional). */
+    /**
+     * Lee una clasificación Dewey válida (opcional).
+     * Valida el formato: 1-3 dígitos seguidos opcionalmente de punto y 1-2 decimales.
+     * Ejemplos válidos: "005.1", "863.64", "100"
+     * 
+     * @return clasificación Dewey válida o null si el usuario omite el campo
+     */
     private String leerClasificacionDewey() {
         while (true) {
             System.out.print("Clasificacion Dewey (ej: 863.64 para literatura | Enter para omitir): ");
@@ -460,7 +509,13 @@ public class MenuHandler {
         }
     }
     
-    /** Lee un año de edición válido (opcional). */
+    /**
+     * Lee un año de edición válido (opcional).
+     * El año debe estar entre 1000 y el año actual.
+     * Permite omitir el campo presionando Enter.
+     * 
+     * @return año de edición válido o null si el usuario omite el campo
+     */
     private Integer leerAnioEdicion() {
         while (true) {
             System.out.print("Anio de edicion (Enter para omitir): ");
@@ -484,7 +539,15 @@ public class MenuHandler {
         }
     }
     
-    /** Lee un año obligatorio (para búsquedas). */
+    /**
+     * Lee un año obligatorio (para búsquedas).
+     * Similar a leerAnioEdicion() pero no permite valores null.
+     * Permite cancelar la operación ingresando 0.
+     * 
+     * @param mensaje texto descriptivo a mostrar al usuario
+     * @return año válido entre 1000 y el año actual
+     * @throws RuntimeException si el usuario cancela ingresando 0
+     */
     private int leerAnioObligatorio(String mensaje) {
         while (true) {
             System.out.print(mensaje + " (0 para cancelar): ");
@@ -512,7 +575,13 @@ public class MenuHandler {
         }
     }
     
-    /** Lee un ISBN con validación de formato. */
+    /**
+     * Lee un ISBN con validación de formato.
+     * Acepta ISBN-10 (10 dígitos) o ISBN-13 (13 dígitos) con o sin guiones.
+     * Ejemplos válidos: "978-3-16-148410-0", "9783161484100", "0123456789"
+     * 
+     * @return ISBN válido o null si el usuario omite el campo
+     */
     private String leerISBN() {
         while (true) {
             System.out.print("ISBN (ej: 978-3-16-148410-0 | Enter para omitir): ");

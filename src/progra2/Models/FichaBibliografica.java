@@ -1,5 +1,11 @@
 package progra2.Models;
 
+/**
+ * Modelo de dominio que representa una ficha bibliográfica.
+ * Contiene información complementaria de catalogación de un libro como ISBN,
+ * clasificación Dewey, ubicación física y idioma.
+ * Todos los campos son opcionales excepto el ID heredado.
+ */
 public class FichaBibliografica extends BaseModel {
     
     /** ISBN del libro (opcional). */
@@ -13,6 +19,7 @@ public class FichaBibliografica extends BaseModel {
 
     /**
      * Constructor completo para crear una ficha bibliográfica.
+     * 
      * @param isbn código ISBN
      * @param clasificacionDewey clasificación decimal Dewey
      * @param estanteria ubicación física
@@ -34,6 +41,7 @@ public class FichaBibliografica extends BaseModel {
     }
     
     /** Obtiene el ISBN de la ficha.
+     * 
      * @return  ISBN de la ficha
      */
     public String getIsbn() {
@@ -50,6 +58,7 @@ public class FichaBibliografica extends BaseModel {
     }
     
     /** Obtiene la clasificación dewey de la ficha.
+     * 
      * @return  Clasificación Dewey de la ficha
      */
     public String getClasificacionDewey() {

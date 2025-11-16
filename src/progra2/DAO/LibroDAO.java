@@ -13,19 +13,19 @@ import progra2.Models.FichaBibliografica;
  */
 public class LibroDAO implements GenericDAO<Libro> {
     
-    /** JAVADOC AQUÍ */
+    /** Query SQL para insertar un nuevo libro. */
     private static final String INSERT_SQL =
             "INSERT INTO libro (titulo, autor, editorial, anio_edicion, ficha_bibliografica_id) VALUES (?, ?, ?, ?, ?)";
     
-    /** JAVADOC AQUÍ */
+    /** Query SQL para actualizar un libro existente. */
     private static final String UPDATE_SQL =
             "UPDATE libro SET titulo = ?, autor = ?, editorial = ?, anio_edicion = ?, ficha_bibliografica_id = ? WHERE id = ?";
     
-    /** JAVADOC AQUÍ */
+    /** Query SQL para eliminación lógica de un libro. */
     private static final String DELETE_SQL =
             "UPDATE libro SET eliminado = TRUE WHERE id = ?";
     
-    /** JAVADOC AQUÍ */
+    /** Query SQL para buscar un libro por ID con JOIN a ficha bibliográfica. */
     private static final String SELECT_BY_ID_SQL =
             "SELECT l.id, l.eliminado, l.titulo, l.autor, l.editorial, l.anio_edicion, " +
             "f.id AS ficha_id, f.eliminado AS ficha_eliminado, f.isbn, f.clasificacion_dewey, f.estanteria, f.idioma " +
@@ -33,7 +33,7 @@ public class LibroDAO implements GenericDAO<Libro> {
             "LEFT JOIN ficha_bibliografica f ON l.ficha_bibliografica_id = f.id " +
             "WHERE l.id = ? AND l.eliminado = FALSE";
     
-    /** JAVADOC AQUÍ */
+    /** Query SQL para buscar libros por título (búsqueda parcial case-insensitive). */
     private static final String SELECT_BY_TITULO_SQL =
             "SELECT l.id, l.eliminado, l.titulo, l.autor, l.editorial, l.anio_edicion, " +
             "f.id AS ficha_id, f.eliminado AS ficha_eliminado, f.isbn, f.clasificacion_dewey, f.estanteria, f.idioma " +
@@ -41,7 +41,7 @@ public class LibroDAO implements GenericDAO<Libro> {
             "LEFT JOIN ficha_bibliografica f ON l.ficha_bibliografica_id = f.id " +
             "WHERE UPPER(l.titulo) LIKE UPPER(?) AND l.eliminado = FALSE";
     
-    /** JAVADOC AQUÍ */
+    /** Query SQL para buscar libros por autor (búsqueda parcial case-insensitive). */
     private static final String SELECT_BY_AUTOR_SQL =
             "SELECT l.id, l.eliminado, l.titulo, l.autor, l.editorial, l.anio_edicion, " +
             "f.id AS ficha_id, f.eliminado AS ficha_eliminado, f.isbn, f.clasificacion_dewey, f.estanteria, f.idioma " +
@@ -49,7 +49,7 @@ public class LibroDAO implements GenericDAO<Libro> {
             "LEFT JOIN ficha_bibliografica f ON l.ficha_bibliografica_id = f.id " +
             "WHERE UPPER(l.autor) LIKE UPPER(?) AND l.eliminado = FALSE";
     
-    /** JAVADOC AQUÍ */
+    /** Query SQL para buscar libros por editorial (búsqueda parcial case-insensitive). */
     private static final String SELECT_BY_EDITORIAL_SQL =
             "SELECT l.id, l.eliminado, l.titulo, l.autor, l.editorial, l.anio_edicion, " +
             "f.id AS ficha_id, f.eliminado AS ficha_eliminado, f.isbn, f.clasificacion_dewey, f.estanteria, f.idioma " +
@@ -57,7 +57,7 @@ public class LibroDAO implements GenericDAO<Libro> {
             "LEFT JOIN ficha_bibliografica f ON l.ficha_bibliografica_id = f.id " +
             "WHERE UPPER(l.editorial) LIKE UPPER(?) AND l.eliminado = FALSE";
     
-    /** JAVADOC AQUÍ */
+    /** Query SQL para buscar libros por año de edición exacto. */
     private static final String SELECT_BY_ANIO_SQL =
             "SELECT l.id, l.eliminado, l.titulo, l.autor, l.editorial, l.anio_edicion, " +
             "f.id AS ficha_id, f.eliminado AS ficha_eliminado, f.isbn, f.clasificacion_dewey, f.estanteria, f.idioma " +
@@ -65,7 +65,7 @@ public class LibroDAO implements GenericDAO<Libro> {
             "LEFT JOIN ficha_bibliografica f ON l.ficha_bibliografica_id = f.id " +
             "WHERE l.anio_edicion = ? AND l.eliminado = FALSE";
     
-    /** JAVADOC AQUÍ */
+    /** Query SQL para buscar libros por idioma (desde la ficha bibliográfica). */
     private static final String SELECT_BY_IDIOMA_SQL =
             "SELECT l.id, l.eliminado, l.titulo, l.autor, l.editorial, l.anio_edicion, " +
             "f.id AS ficha_id, f.eliminado AS ficha_eliminado, f.isbn, f.clasificacion_dewey, f.estanteria, f.idioma " +
@@ -73,7 +73,7 @@ public class LibroDAO implements GenericDAO<Libro> {
             "LEFT JOIN ficha_bibliografica f ON l.ficha_bibliografica_id = f.id " +
             "WHERE UPPER(f.idioma) = UPPER(?) AND l.eliminado = FALSE";
     
-    /** JAVADOC AQUÍ */
+    /** Query SQL para obtener todos los libros no eliminados con sus fichas. */
     private static final String SELECT_ALL_SQL =
             "SELECT l.id, l.eliminado, l.titulo, l.autor, l.editorial, l.anio_edicion, " +
             "f.id AS ficha_id, f.eliminado AS ficha_eliminado, f.isbn, f.clasificacion_dewey, f.estanteria, f.idioma " +
@@ -84,7 +84,13 @@ public class LibroDAO implements GenericDAO<Libro> {
     
     // ===================== Métodos con conexion propia =====================
     
-    /** JAVADOC AQUÍ */
+    /**
+     * Inserta un nuevo libro en la base de datos.
+     * Crea su propia conexión y la cierra automáticamente.
+     * 
+     * @param libro el libro a insertar
+     * @throws SQLException si hay error en la inserción
+     */
     @Override
     public void insertar(Libro libro) throws SQLException {
         try (Connection conn = DatabaseConnection.getConnection()) {
@@ -92,7 +98,13 @@ public class LibroDAO implements GenericDAO<Libro> {
         }
     }
     
-    /** JAVADOC AQUÍ */
+    /**
+     * Actualiza un libro existente en la base de datos.
+     * Crea su propia conexión y la cierra automáticamente.
+     * 
+     * @param libro el libro con datos actualizados
+     * @throws SQLException si hay error en la actualización
+     */
     @Override
     public void actualizar(Libro libro) throws SQLException {
         try (Connection conn = DatabaseConnection.getConnection()) {
@@ -100,7 +112,13 @@ public class LibroDAO implements GenericDAO<Libro> {
         }
     }
     
-    /** JAVADOC AQUÍ */
+    /**
+     * Elimina lógicamente un libro (soft delete).
+     * Crea su propia conexión y la cierra automáticamente.
+     * 
+     * @param id identificador del libro a eliminar
+     * @throws SQLException si hay error en la eliminación
+     */
     @Override
     public void eliminar(int id) throws SQLException {
         try (Connection conn = DatabaseConnection.getConnection()) {
@@ -108,7 +126,14 @@ public class LibroDAO implements GenericDAO<Libro> {
         }
     }
     
-    /** JAVADOC AQUÍ */
+    /**
+     * Obtiene un libro por su ID, incluyendo su ficha bibliográfica si tiene.
+     * Crea su propia conexión y la cierra automáticamente.
+     * 
+     * @param id identificador del libro
+     * @return el libro encontrado o null si no existe
+     * @throws SQLException si hay error en la consulta
+     */
     @Override
     public Libro getById(int id) throws SQLException {
         try (Connection conn = DatabaseConnection.getConnection()) {
@@ -116,7 +141,13 @@ public class LibroDAO implements GenericDAO<Libro> {
         }
     }
     
-    /** JAVADOC AQUÍ */
+    /**
+     * Obtiene todos los libros no eliminados con sus fichas bibliográficas.
+     * Crea su propia conexión y la cierra automáticamente.
+     * 
+     * @return lista de libros
+     * @throws SQLException si hay error en la consulta
+     */
     @Override
     public List<Libro> getAll() throws SQLException {
         try (Connection conn = DatabaseConnection.getConnection()) {
@@ -126,7 +157,14 @@ public class LibroDAO implements GenericDAO<Libro> {
     
     // =========== Métodos con conexion Externa (Para transacciones) ===========
     
-    /** JAVADOC AQUÍ */
+    /**
+     * Inserta un libro usando una conexión externa (para transacciones).
+     * No cierra la conexión (debe ser manejada por el llamador).
+     * 
+     * @param libro el libro a insertar
+     * @param conn conexión de base de datos externa
+     * @throws SQLException si hay error en la inserción
+     */
     public void insertar(Libro libro, Connection conn) throws SQLException {
         try (PreparedStatement stmt = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
             
@@ -136,7 +174,14 @@ public class LibroDAO implements GenericDAO<Libro> {
         }
     }
     
-    /** JAVADOC AQUÍ */
+    /**
+     * Actualiza un libro usando una conexión externa (para transacciones).
+     * No cierra la conexión (debe ser manejada por el llamador).
+     * 
+     * @param libro el libro con datos actualizados
+     * @param conn conexión de base de datos externa
+     * @throws SQLException si hay error en la actualización
+     */
     public void actualizar(Libro libro, Connection conn) throws SQLException {
         try (PreparedStatement stmt = conn.prepareStatement(UPDATE_SQL)) {
             
@@ -150,7 +195,14 @@ public class LibroDAO implements GenericDAO<Libro> {
         }
     }
     
-    /** JAVADOC AQUÍ */
+    /**
+     * Elimina lógicamente un libro usando una conexión externa.
+     * No cierra la conexión (debe ser manejada por el llamador).
+     * 
+     * @param id identificador del libro
+     * @param conn conexión de base de datos externa
+     * @throws SQLException si hay error en la eliminación
+     */
     public void eliminar(int id, Connection conn) throws SQLException {
         try (PreparedStatement stmt = conn.prepareStatement(DELETE_SQL)) {
             
@@ -166,7 +218,16 @@ public class LibroDAO implements GenericDAO<Libro> {
     
     // ========================= Metodos de busqueda =========================
     
-    /** JAVADOC AQUÍ */
+    /**
+     * Obtiene un libro por su ID usando una conexión externa.
+     * Incluye un LEFT JOIN con la ficha bibliográfica.
+     * No cierra la conexión (debe ser manejada por el llamador).
+     * 
+     * @param id identificador del libro
+     * @param conn conexión de base de datos externa
+     * @return el libro encontrado con su ficha o null si no existe
+     * @throws SQLException si hay error en la consulta
+     */
     public Libro getById(int id, Connection conn) throws SQLException {
         try (PreparedStatement stmt = conn.prepareStatement(SELECT_BY_ID_SQL)) {
             
@@ -181,7 +242,13 @@ public class LibroDAO implements GenericDAO<Libro> {
         return null;
     }
     
-    /** JAVADOC AQUÍ */
+    /**
+     * Busca libros cuyo título contenga el texto especificado (case-insensitive).
+     * 
+     * @param titulo texto a buscar en el título
+     * @return lista de libros que coinciden
+     * @throws SQLException si hay error en la consulta
+     */
     public List<Libro> getByTitulo(String titulo) throws SQLException {
         List<Libro> libros = new ArrayList<>();
         
@@ -199,7 +266,13 @@ public class LibroDAO implements GenericDAO<Libro> {
         return libros;
     }
     
-    /** JAVADOC AQUÍ */
+    /**
+     * Busca libros cuyo autor contenga el texto especificado (case-insensitive).
+     * 
+     * @param autor texto a buscar en el autor
+     * @return lista de libros que coinciden
+     * @throws SQLException si hay error en la consulta
+     */
     public List<Libro> getByAutor(String autor) throws SQLException {
         List<Libro> libros = new ArrayList<>();
         
@@ -217,7 +290,13 @@ public class LibroDAO implements GenericDAO<Libro> {
         return libros;
     }
     
-    /** JAVADOC AQUÍ */
+    /**
+     * Busca libros cuya editorial contenga el texto especificado (case-insensitive).
+     * 
+     * @param editorial texto a buscar en la editorial
+     * @return lista de libros que coinciden
+     * @throws SQLException si hay error en la consulta
+     */
     public List<Libro> getByEditorial(String editorial) throws SQLException {
         List<Libro> libros = new ArrayList<>();
 
@@ -235,7 +314,13 @@ public class LibroDAO implements GenericDAO<Libro> {
         return libros;
     }
     
-    /** JAVADOC AQUÍ */
+    /**
+     * Busca libros publicados en un año específico.
+     * 
+     * @param anio año de edición a buscar
+     * @return lista de libros publicados en ese año
+     * @throws SQLException si hay error en la consulta
+     */
     public List<Libro> getByAnioEdicion(int anio) throws SQLException {
         List<Libro> libros = new ArrayList<>();
         
@@ -253,7 +338,13 @@ public class LibroDAO implements GenericDAO<Libro> {
         return libros;
     }
     
-    /** JAVADOC AQUÍ */
+    /**
+     * Busca libros por idioma (basado en la ficha bibliográfica).
+     * 
+     * @param idioma idioma a buscar (comparación exacta case-insensitive)
+     * @return lista de libros en ese idioma
+     * @throws SQLException si hay error en la consulta
+     */
     public List<Libro> getByIdioma(String idioma) throws SQLException {
         List<Libro> libros = new ArrayList<>();
         
@@ -271,7 +362,14 @@ public class LibroDAO implements GenericDAO<Libro> {
         return libros;
     }
     
-    /** JAVADOC AQUÍ */
+    /**
+     * Obtiene todos los libros usando una conexión externa.
+     * No cierra la conexión (debe ser manejada por el llamador).
+     * 
+     * @param conn conexión de base de datos externa
+     * @return lista de todos los libros no eliminados
+     * @throws SQLException si hay error en la consulta
+     */
     public List<Libro> getAll(Connection conn) throws SQLException {
         List<Libro> libros = new ArrayList<>();
           
@@ -288,7 +386,14 @@ public class LibroDAO implements GenericDAO<Libro> {
     
     // ========================== Métodos Auxiliares ==========================
     
-    /** Configura los parámetros del PreparedStatement con los datos del libro. */
+    /**
+     * Configura los parámetros del PreparedStatement con los datos del libro.
+     * Maneja valores nullable para año de edición y ficha bibliográfica.
+     * 
+     * @param stmt el PreparedStatement a configurar
+     * @param libro el libro con los datos a insertar/actualizar
+     * @throws SQLException si hay error al configurar los parámetros
+     */
     private void setLibroParameters(PreparedStatement stmt, Libro libro) throws SQLException {
         stmt.setString(1, libro.getTitulo());
         stmt.setString(2, libro.getAutor());
@@ -309,7 +414,13 @@ public class LibroDAO implements GenericDAO<Libro> {
         }
     }
     
-    /** Obtiene el ID generado por la BD y lo asigna al objeto libro. */  
+    /**
+     * Obtiene el ID generado por la base de datos y lo asigna al objeto libro.
+     * 
+     * @param stmt el PreparedStatement que ejecutó la inserción
+     * @param libro el libro al que asignar el ID generado
+     * @throws SQLException si no se pudo obtener el ID generado
+     */
     private void setGeneratedId(PreparedStatement stmt, Libro libro) throws SQLException {
         try (ResultSet keys = stmt.getGeneratedKeys()) {
             if (keys.next()) {
@@ -320,7 +431,15 @@ public class LibroDAO implements GenericDAO<Libro> {
         }
     }
     
-    /** Mapea un ResultSet a un objeto Libro con su FichaBibliografica asociada. */
+    /**
+     * Mapea un ResultSet a un objeto Libro con su FichaBibliografica asociada.
+     * Si el libro no tiene ficha asociada, el campo será null.
+     * Maneja correctamente los valores nullable del ResultSet.
+     * 
+     * @param rs el ResultSet posicionado en una fila válida
+     * @return objeto Libro completamente poblado
+     * @throws SQLException si hay error al leer los datos del ResultSet
+     */
     private Libro mapResultSetToLibro(ResultSet rs) throws SQLException {
         FichaBibliografica ficha = null;
         

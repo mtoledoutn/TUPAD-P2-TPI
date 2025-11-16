@@ -1,20 +1,26 @@
 package progra2.Models;
 
+/**
+ * Modelo de dominio que representa un libro en el sistema de biblioteca.
+ * Contiene información básica del libro y puede tener asociada una ficha bibliográfica.
+ * Los campos obligatorios son título y autor; el resto son opcionales.
+ */
 public class Libro extends BaseModel {
     
-    /** JAVADOC AQUÍ */
+    /** Título del libro (obligatorio). */
     private String titulo;
-    /** JAVADOC AQUÍ */
+    /** Autor del libro (obligatorio). */
     private String autor;
-    /** JAVADOC AQUÍ */
+    /** Editorial del libro (opcional). */
     private String editorial;
-    /** JAVADOC AQUÍ */
+    /** Año de edición del libro (opcional, puede ser null). */
     private Integer anioEdicion;
-    /** JAVADOC AQUÍ */
+    /** Ficha bibliográfica asociada al libro (opcional). */
     private FichaBibliografica fichaBibliografica;
     
     /** 
      * Constructor completo para crear un libro con todos sus datos.
+     * 
      * @param id identificador del libro
      * @param titulo titulo del libro (obligatorio)
      * @param autor autor del libro (obligatorio)
