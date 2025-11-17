@@ -223,6 +223,7 @@ public class FichaBibliograficaDAO implements GenericDAO<FichaBibliografica> {
      * 
      * @param isbn el ISBN a verificar
      * @return true si exise, false en caso contrario
+     * @throws SQLException si hay error en la consulta
      */
     public boolean existeISBN(String isbn) throws SQLException {
         if (isbn == null || isbn.trim().isEmpty()) {
