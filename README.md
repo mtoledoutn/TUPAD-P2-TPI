@@ -2,11 +2,25 @@
 
 ## Trabajo Final Integrador - Programación 2
 
-### Descripción del Proyecto
+### Alumnos:
+- Elvio Nahuel Romero Alani
+- Gastón Zarate
+- Martín Ezequiel Toledo
+- Abel Tomás Romero
+
+<br>
+
+**Enlace del video explicativo:** 
+
+<br>
+
+## Descripción del Proyecto
 
 Este Trabajo Final Integrador implementa un sistema completo de gestión de biblioteca que permite administrar libros y sus fichas bibliográficas mediante operaciones CRUD. El proyecto demuestra la aplicación práctica de los conceptos fundamentales de Programación Orientada a Objetos, JDBC y arquitectura en capas aprendidos durante el cursado de Programación 2.
 
 El dominio elegido es **Libro → FichaBibliografica**, una relación unidireccional 1→1 donde cada libro puede tener asociada una ficha bibliográfica que contiene información complementaria de catalogación (ISBN, clasificación Dewey, ubicación física, idioma).
+
+<br>
 
 ### Objetivos Académicos
 
@@ -59,7 +73,7 @@ El desarrollo de este sistema permite aplicar y consolidar los siguientes concep
 - Validación de unicidad de ISBN
 - Foreign Key única garantiza relación 1→1
 
-
+<br>
 
 ### Funcionalidades Implementadas
 
@@ -86,7 +100,7 @@ El desarrollo de este sistema permite aplicar y consolidar los siguientes concep
 - **Validaciones robustas**: Multi-capa (entrada, negocio, BD)
 - **Normalización automática**: Trim + uppercase en todos los campos de texto
 
-
+<br>
 
 ## Requisitos del Sistema
 
@@ -97,7 +111,7 @@ El desarrollo de este sistema permite aplicar y consolidar los siguientes concep
 | Gradle            | 8.12 (incluido wrapper) |
 | Sistema Operativo | Windows, Linux o macOS  |
 
-
+<br>
 
 ## Instalación
 
@@ -176,7 +190,7 @@ java -Ddb.url=jdbc:mysql://localhost:3306/dbtpi3 \
      -cp ...
 ```
 
-
+<br>
 
 ## Ejecución
 
@@ -207,6 +221,8 @@ dir /s /b %USERPROFILE%\.gradle\caches\*mysql-connector-j-*.jar
 java -cp "build\classes\java\main;<ruta-mysql-jar>" progra2.Main.Main
 ```
 
+<br>
+
 ### Verificar Conexión
 
 Para probar solo la conexión a la base de datos:
@@ -228,7 +244,7 @@ Informacion de la conexion:
 - Driver: MySQL Connector/J v8.4.0
 ```
 
-
+<br>
 
 ## Uso del Sistema
 
@@ -251,6 +267,8 @@ Informacion de la conexion:
 4. Eliminar libro
 0. Volver al menu principal
 ```
+
+<br>
 
 ### Ejemplos de Uso
 
@@ -367,7 +385,7 @@ Anio de edicion (Enter para omitir): 1605
 Libro Creado exitosamente con ID: 5
 ```
 
-
+<br>
 
 ## Arquitectura del Sistema
 
@@ -439,21 +457,21 @@ Libro Creado exitosamente con ID: 5
 - `MenuDisplay.java`: Renderizado de menús
 - `TestConexion.java`: Utilidad de verificación de conexión
   
-  
+<br>
 
 ## Modelo de Datos
 
 ```
-┌────────────────────────┐          ┌──────────────────────┐
-│        libro           │          │  ficha_bibliografica │
-├────────────────────────┤          ├──────────────────────┤
-│ id (PK)                │          │ id (PK)              │
-│ titulo                 │          │ isbn (UNIQUE)        │
-│ autor                  │          │ clasificacion_dewey  │
-│ editorial              │          │ estanteria           │
-│ anio_edicion           │          │ idioma               │
-│ ficha_bibliografica_id │──────┐   │ eliminado            │
-│ eliminado              │      │   └──────────────────────┘
+┌────────────────────────┐          ┌───────────────────────┐
+│         libro          │          │  ficha_bibliografica  │
+├────────────────────────┤          ├───────────────────────┤
+│ id (PK)                │          │ id (PK)               │
+│ titulo                 │          │ isbn (UNIQUE)         │
+│ autor                  │          │ clasificacion_dewey   │
+│ editorial              │          │ estanteria            │
+│ anio_edicion           │          │ idioma                │
+│ ficha_bibliografica_id │──────┐   │ eliminado             │
+│ eliminado              │      │   └───────────────────────┘
 └────────────────────────┘      │
                                 │
                                 └──▶ Relación 1→1 Unidireccional
@@ -468,7 +486,7 @@ Libro Creado exitosamente con ID: 5
 - **Soft Delete**: Campo `eliminado` para eliminación lógica
 - **ISBN Único**: Constraint en BD + validación en Service
   
-  
+<br>
 
 ## Validaciones Implementadas
 
@@ -495,8 +513,8 @@ Libro Creado exitosamente con ID: 5
 - `UNIQUE` en ISBN y ficha_bibliografica_id
 - `FOREIGN KEY` con ON DELETE CASCADE
 - `CHECK` implícito en tipos de datos
-  
-  
+
+<br>
 
 ## Patrones y Buenas Prácticas
 
@@ -531,7 +549,7 @@ Libro Creado exitosamente con ID: 5
 - SELECT filtra: `WHERE eliminado = FALSE`
 - No hay eliminación física de datos
   
-  
+<br>
 
 ## Solución de Problemas
 
@@ -581,7 +599,7 @@ net start MySQL80
 
 **Solución**: Usar un ISBN diferente o actualizar la ficha existente
 
-
+<br>
 
 ## Tecnologías Utilizadas
 
@@ -591,17 +609,17 @@ net start MySQL80
 - **JDBC Driver**: mysql-connector-j 8.4.0
 - **Character Set**: UTF-8 (utf8mb4_unicode_ci)
   
-  
+<br>
 
 ## Estructura de Directorios
 
 ```
 proyecto-biblioteca/
-├── lib/                       # 
-├── nbproject/                 # 
-├── sql/
-│   ├── create_database.sql    # Script de creación de BD y tablas
-│   └── insert_test_data.sql   # Datos de prueba
+├── lib/                       # Dependencias externas (JAR MySQL Connector)
+├── nbproject/                 # Archivos de configuración del proyecto NetBeans
+├── sql/                       # Scripts de creación de BD con sus tablas y datos de prueba
+│   ├── create_database.sql
+│   └── insert_test_data.sql
 ├── src/progra2/
 │   ├── Config/                # Conexión y transacciones
 │   │   ├── DatabaseConnection.java
@@ -624,18 +642,19 @@ proyecto-biblioteca/
 │       ├── FichaBibliograficaService.java
 │       ├── GenericService.java
 │       └── LibroService.java
-├── .gitignore                 # Archivo gitignore
-├── build.xml                  # 
-├── manifest.mf                # 
-├── HISTORIAS_DEL_USUARIO      # Especificaciones funcionales
-└── README.md                  # Este archivo
+├── .gitignore                 # Archivo gitignore para exclusiones de Git
+├── Informe.pdf                # Informe del proyecto grupal
+├── README.md                  # Este archivo
+├── UML.jpeg                   # Diagrama UML del proyecto
+├── build.xml                  # Script de construcción Ant (NetBeans)
+└── manifest.mf                # Metadatos del archivo JAR
 ```
 
-
+<br>
 
 ## Convenciones de Código
 
-- **Idioma**: Español (clases, métodos, variables)
+- **Idioma**: Español e Ingles (clases, métodos, variables)
 - **Nomenclatura**:
   - Clases: PascalCase (`LibroService`)
   - Métodos: camelCase (`buscarPorAutor`)
@@ -645,7 +664,7 @@ proyecto-biblioteca/
 - **SQL**: Constantes private static final
 - **Excepciones**: Capturar y manejar con mensajes claros
   
-  
+<br>
 
 ## Conceptos de Programación 2 Demostrados
 
@@ -663,11 +682,11 @@ proyecto-biblioteca/
 | **Dependency Injection** | Manual en constructores                                 |
 | **Transacciones**        | setAutoCommit(false), commit(), rollback()              |
 
-
+<br>
 
 ---
 
-
+<br>
 
 **Versión**: 1.0  
 **Java**: 17+  

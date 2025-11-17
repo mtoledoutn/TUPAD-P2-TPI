@@ -121,6 +121,7 @@ public class FichaBibliograficaDAO implements GenericDAO<FichaBibliografica> {
      * 
      * @param ficha la ficha a insertar
      * @param conn la conexion de base de datos (manejada externamente)
+     * @throws SQLException si hay error en la inserción
      */
     public void insertar(FichaBibliografica ficha, Connection conn) throws SQLException {
         try (PreparedStatement stmt = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
